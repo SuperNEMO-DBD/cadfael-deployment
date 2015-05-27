@@ -1,0 +1,210 @@
+#!/bin/bash
+# VERY dumb installer for CadfaelBrew - in Bash for maximum portability
+# at present. Maybe Python/Ruby later on if more advanced functionality
+# is needed.
+# - Determine system
+# - Check deps
+# - Checkout correct repo
+# - brew doctor
+# - (optional) brew install
+
+#-----------------------------------------------------------------------
+# MINIMAL API
+#-----------------------------------------------------------------------
+# - Logging
+#
+# - Exit with failure
+_echo_exit()
+{
+  _echo_error "$1"
+  exit 1
+}
+
+# - Info
+_echo_info()
+{
+  echo "[cadfael:info] $1"
+}
+
+# - Warning
+_echo_warning()
+{
+  echo "[cadfael:warning] $1" 1>&2
+}
+
+# - Error
+_echo_error()
+{
+  echo "[cadfael:error] $1" 1>&2
+}
+
+
+#-----------------------------------------------------------------------
+# GLOBAL SETTINGS
+#-----------------------------------------------------------------------
+# - Self location and CWD
+readonly kCADFAELINSTALLERDIR=`dirname $0`
+readonly kWORKINGDIR=`pwd`
+
+# - Operating System ID, Version and Packaging System
+readonly kOS=$(uname -s)
+
+case "$kOS" in
+  "Darwin")
+    readonly kOSVERSION=$(sw_vers -productVersion)
+    readonly kPACKAGETOOL="pkg"
+    ;;
+  "Linux")
+    # - Determine distro
+    kLSB_RELEASE=$(command -v lsb_release)
+    if [ -n "${kLSB_RELEASE}" ] ; then
+      readonly kOSDISTRO=$($kLSB_RELEASE -si | sed 's/ //')
+      readonly kOSVERSION=$($kLSB_RELEASE -sr)
+    else
+      # Long term, probably want to check existence of the
+      # /etc/<NAME>-release files because lsb_release may not always
+      # be installed on a base system
+      echo "error: No 'lsb_release' command found"
+      exit 1
+    fi
+
+    # - Determine package/manager system
+    if [[ "$kOSDISTRO" == "Debian|Ubuntu" ]] ; then
+      readonly kPACKAGETOOL="dpkg"
+      readonly kPACKAGEMANAGER="apt"
+    elif [[ "$kOSDISTRO" == "RedHat.*|CentOS|Scientific" ]] ; then
+      readonly kPACKAGETOOL="rpm"
+      readonly kPACKAGETOOL="yum"
+    elif [[ "$kOSDISTRO" == "SUSELINUX" ]] ; then
+      readonly kPACKAGETOOL="rpm"
+      readonly kPACKAGEMANAGER="zypper"
+    else
+      # Can only mark as empty and warn later on that no packages can
+      # be checked
+      readonly kPACKAGETOOL=""
+      readonly kPACKAGEMANAGER=""
+    fi
+    ;;
+  *)
+    echo "error: Unsupported OS '$kOS'"
+    echo "error: Only Linux and Darwin are currently supported"
+    exit 1
+    ;;
+esac
+
+# - Architecture
+readonly kARCH=$(uname -m)
+if [ "${kARCH}" != "x86_64" ] ; then
+  echo "error: Unsupported architecture '$kARCH'"
+  echo "error: Only 'x86_64' architectures are currently supported"
+  exit 1
+fi
+
+
+#-----------------------------------------------------------------------
+# LINUX PACKAGE CHECKS
+# - Each supported system will have list of package names to be checked
+# possibly also package groups. That should then be input to relevant
+# package query check. Any missing packages should be collected and
+# reported to user in a command line format, e.g.
+#
+# """
+# Your system has missing packages, please run
+#
+#   yum install foo bar baz
+#"""
+
+#-----------------------------------------------------------------------
+# Check if a given rpm package is installed
+checkRPM () {
+  isInstalled=$(rpm -q $1 --qf "%{NAME}-%{VERSION}-%{RELEASE}")
+  if [ $? -eq 0 ] ; then
+    echo "$isInstalled"
+  else
+    echo "no"
+  fi
+}
+
+#checkSUSELINUX() {
+#requiredPkgs="curl gcc foo"
+#missingPkgs=""
+#
+#for pkg in $requiredPkgs ; do
+#  havePkg=$(checkRPM $pkg)
+#  _echo_info "checking that RPM '$pkg' is installed: $havePkg"
+#  if [ "$havePkg" = "no" ] ; then
+#    missingPkgs="$missingPkgs $pkg"
+#  fi
+#done
+#
+#if [ -n "$missingPkgs" ] ; then
+#  _echo_error "RPM packages '$missingPkgs' are not installed on this system"
+#  _echo_error "Please run (or get your sysadmin to run):
+#  
+#  yum install $missingPkgs
+#  "
+#  #_echo_exit "Unable to bootstrap: missing required system packages"
+#fi
+#}
+
+#-----------------------------------------------------------------------
+# - Check that this linux provides the needed system software
+#   On Linux, more checks are needed as there's less we can rely on
+#   Long term, Linux checks will need to be refactored as they'll
+#   be distro/version dependent, and we'll want to really check installed
+#   packages (rpm/deb)
+#
+checkLinuxSystemSoftware () {
+  # - Git...
+  command -v git > /dev/null 2>&1 || _echo_exit "Required program 'git' not found"
+  # - Ruby
+  command -v ruby > /dev/null 2>&1 || _echo_exit "Required program 'ruby' not found"
+}
+
+#-----------------------------------------------------------------------
+# - Check that the OS provides the software on which brew relies
+#   On OSX, homebrew's doctor will handle this for us.
+#   On Linux, defer to more involved checking system
+#
+checkSystemSoftware () {
+  case "$1" in
+    "Darwin")
+      _echo_warning "Software checks deferred to initial run of 'brew doctor'"
+      ;;
+    "Linux")
+      checkLinuxSystemSoftware
+      ;;
+    *)
+      _echo_exit "Unknown system '$1'"
+      ;;
+  esac
+}
+
+
+#-----------------------------------------------------------------------
+# Implementation
+main() {
+  _echo_info "Detected '$kOS' Operating System"
+  _echo_info "Distribution '$kOSDISTRO ($kOSVERSION)'"
+
+  _echo_info "Running System Software Checks"
+  checkSystemSoftware $kOS
+
+  # - Get correct branch for this system
+  local cadfaelGitURL="linuxbrew"
+
+  if [ -n "$cadfaelGitURL" ] ; then
+    _echo_info "Cloning repo for $kOS"
+    pushd $installDir > /dev/null 2>&1
+    #git clone $cadfaelGitURL
+    popd > /dev/null 2>&1
+    _echo_info "Running first system diagnosis using doctor"
+    #"$installDir"/bin/brew doctor
+    _echo_info "If you see warnings above, follow their instructions and rerun 'brew doctor'"
+  else
+    _echo_exit "No valid git repo found"
+  fi
+}
+
+main
+
