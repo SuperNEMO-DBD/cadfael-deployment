@@ -45,6 +45,11 @@ _echo_error()
 readonly kCADFAELINSTALLERDIR=`dirname $0`
 readonly kWORKINGDIR=`pwd`
 
+# - Github baseurl
+readonly kGITHUBORG="SuperNEMO-DBD"
+readonly kGITHUBURL="https://github.com/$kGITHUBORG"
+readonly kCADFAELTAP="$kGITHUBORG/cadfael"
+
 # - Supported systems
 declare -a kSUPPORTEDSYSTEMS
 readonly kSUPPORTEDSYSTEMS=("Darwin-10.9"\
@@ -194,7 +199,7 @@ doCheckSystemSoftware () {
 #-----------------------------------------------------------------------
 # Clone appropriate github repo for this OS into supplied directory
 doGithubClone () {
-  local baseurl="https://github.com/SuperNEMO-DBD/"
+  local baseurl="$kGITHUBURL"
   local reponame=""
   case "$kOS" in
     "Darwin")
@@ -208,7 +213,7 @@ doGithubClone () {
       ;;
   esac
 
-  local cloneurl="$baseurl$reponame"
+  local cloneurl="$baseurl/$reponame"
   local clonedir=$(readlink -m "$1/Cadfael.git")
 
   if [ -d "$clonedir" ] ; then
@@ -218,6 +223,29 @@ doGithubClone () {
   _echo_info "Cloning '$reponame' into $clonedir"
   git clone "$cloneurl" "$clonedir"
   return $?
+}
+
+#-----------------------------------------------------------------------
+# Perform initial setup of Brew
+# Tap Cadfael, run doctor
+doBrewSetup() {
+  _echo_info "setting up brew"
+  if [ -z "$1" ] ; then _echo_exit "No install directory" ; fi
+
+  _echo_info "Tapping formulae from '$kCADFAELTAP'"
+  if ! PATH="$1/Cadfael.git/bin:$PATH" brew tap "$kCADFAELTAP" ; then
+    _echo_exit "failed to tap '$kCADFAELTAP'"
+  fi
+
+  if ! PATH="$1/Cadfael.git/bin:$PATH" brew doctor ; then
+    _echo_warning "brew doctor issued warnings
+  
+  These generally are not severe and can be ignored
+
+  "
+  fi
+
+  return 0
 }
 
 #-----------------------------------------------------------------------
@@ -295,9 +323,10 @@ main() {
   fi
 
   doGithubClone "$installPrefix" || _echo_exit "Failed to clone repo"
+  doBrewSetup "$installPrefix" || _echo_exit "Brew setup failed"
 
   return 0
 }
 
 main "$@"
-return $?
+exit $?
