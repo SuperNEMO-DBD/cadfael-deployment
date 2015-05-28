@@ -216,7 +216,7 @@ doGithubClone () {
   fi
 
   _echo_info "Cloning '$reponame' into $clonedir"
-  #git clone "$cloneurl" "$clonedir"
+  git clone "$cloneurl" "$clonedir"
   return $?
 }
 
@@ -253,7 +253,8 @@ EOF
 }
 
 #-----------------------------------------------------------------------
-# Implementation
+# IMPLEMENTATION
+
 main() {
   local installPrefix=$(pwd)
 
@@ -299,4 +300,4 @@ main() {
 }
 
 main "$@"
-
+return $?
