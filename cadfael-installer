@@ -38,13 +38,19 @@ _echo_error()
   echo "[cadfael:error] $1" 1>&2
 }
 
-
 #-----------------------------------------------------------------------
-# GLOBAL SETTINGS
+# GLOBAL VALUES/SETTINGS
 #-----------------------------------------------------------------------
 # - Self location and CWD
 readonly kCADFAELINSTALLERDIR=`dirname $0`
 readonly kWORKINGDIR=`pwd`
+
+# - Supported systems
+declare -a kSUPPORTEDSYSTEMS
+readonly kSUPPORTEDSYSTEMS=("Darwin-10.9"\
+                            "Darwin-10.10" \
+                            "SUSELINUX-11" \
+                            "Ubuntu-14.04")
 
 # - Operating System ID, Version and Packaging System
 readonly kOS=$(uname -s)
@@ -64,8 +70,7 @@ case "$kOS" in
       # Long term, probably want to check existence of the
       # /etc/<NAME>-release files because lsb_release may not always
       # be installed on a base system
-      echo "error: No 'lsb_release' command found"
-      exit 1
+      _echo_exit "error: No 'lsb_release' command found"
     fi
 
     # - Determine package/manager system
@@ -86,20 +91,32 @@ case "$kOS" in
     fi
     ;;
   *)
-    echo "error: Unsupported OS '$kOS'"
-    echo "error: Only Linux and Darwin are currently supported"
-    exit 1
+    # A hard fail here because we really can't progress any further
+    _echo_error "Unsupported OS '$kOS'"
+    _echo_exit  "Only Linux and Darwin are currently supported"
     ;;
 esac
 
 # - Architecture
 readonly kARCH=$(uname -m)
 if [ "${kARCH}" != "x86_64" ] ; then
-  echo "error: Unsupported architecture '$kARCH'"
-  echo "error: Only 'x86_64' architectures are currently supported"
-  exit 1
+  # Hard fail because it's not worth going any further
+  _echo_error "Unsupported architecture '$kARCH'"
+  _echo_exit  "Only 'x86_64' architectures are currently supported"
 fi
 
+#-----------------------------------------------------------------------
+# MAIN API
+#-----------------------------------------------------------------------
+# - System validation
+# Take system 'distro-version' string and return 0 if supported, 1 otherwise
+isSystemSupported () {
+  local elem
+  for elem in "${kSUPPORTEDSYSTEMS[@]}" ; do
+    [[ "$elem" == "$1" ]] && return 0
+  done
+  return 1
+}
 
 #-----------------------------------------------------------------------
 # LINUX PACKAGE CHECKS
@@ -116,6 +133,7 @@ fi
 
 #-----------------------------------------------------------------------
 # Check if a given rpm package is installed
+# Echo package name-version-release string if installed, "no" otherwise
 checkRPM () {
   isInstalled=$(rpm -q $1 --qf "%{NAME}-%{VERSION}-%{RELEASE}")
   if [ $? -eq 0 ] ; then
@@ -125,10 +143,14 @@ checkRPM () {
   fi
 }
 
-#checkSUSELINUX() {
-#requiredPkgs="curl gcc foo"
-#missingPkgs=""
-#
+#-----------------------------------------------------------------------
+# Check if a given deb package is installed
+checkDeb () {
+  _echo_exit "checkDeb not implemented yet"
+}
+
+#-----------------------------------------------------------------------
+# Example of loop over list of packages, with collection of missing ones
 #for pkg in $requiredPkgs ; do
 #  havePkg=$(checkRPM $pkg)
 #  _echo_info "checking that RPM '$pkg' is installed: $havePkg"
@@ -148,63 +170,128 @@ checkRPM () {
 #}
 
 #-----------------------------------------------------------------------
-# - Check that this linux provides the needed system software
-#   On Linux, more checks are needed as there's less we can rely on
-#   Long term, Linux checks will need to be refactored as they'll
-#   be distro/version dependent, and we'll want to really check installed
-#   packages (rpm/deb)
-#
-checkLinuxSystemSoftware () {
-  # - Git...
-  command -v git > /dev/null 2>&1 || _echo_exit "Required program 'git' not found"
-  # - Ruby
-  command -v ruby > /dev/null 2>&1 || _echo_exit "Required program 'ruby' not found"
-}
-
-#-----------------------------------------------------------------------
 # - Check that the OS provides the software on which brew relies
-#   On OSX, homebrew's doctor will handle this for us.
+#   On OSX, homebrew's doctor will handle this for us, though note
+#   that their installer also checks for Xcode
 #   On Linux, defer to more involved checking system
-#
-checkSystemSoftware () {
-  case "$1" in
+doCheckSystemSoftware () {
+  case "$kOS" in
     "Darwin")
-      _echo_warning "Software checks deferred to initial run of 'brew doctor'"
+      _echo_warning "Not implemented: needs to check for xcode"
+      return 0
       ;;
     "Linux")
-      checkLinuxSystemSoftware
+      _echo_warning "Not implemented: check for rpms/debs"
+      return 0
       ;;
     *)
-      _echo_exit "Unknown system '$1'"
+      _echo_exit "doCheckSystemSoftware run with unknown OS '$kOS'"
+      return 1
       ;;
   esac
 }
 
+#-----------------------------------------------------------------------
+# Clone appropriate github repo for this OS into supplied directory
+doGithubClone () {
+  local baseurl="https://github.com/SuperNEMO-DBD/"
+  local reponame=""
+  case "$kOS" in
+    "Darwin")
+      reponame="homebrew.git"
+      ;;
+    "Linux")
+      reponame="linuxbrew.git"
+      ;;
+    *)
+      _echo_exit "doGithubClone run with unknown kOS('$kOS')"
+      ;;
+  esac
+
+  local cloneurl="$baseurl$reponame"
+  local clonedir=$(readlink -m "$1/Cadfael.git")
+
+  if [ -d "$clonedir" ] ; then
+    _echo_exit "Installation destination exists"
+  fi
+
+  _echo_info "Cloning '$reponame' into $clonedir"
+  #git clone "$cloneurl" "$clonedir"
+  return $?
+}
+
+#-----------------------------------------------------------------------
+# Usage and Help
+#
+displayUsage() {
+  echo "Usage: cadfael-installer [-h] [-p <prefix>]"
+}
+
+displayHelp() {
+  cat <<EOF
+$(displayUsage)
+
+Install Cadfael.git package manager and base SDK for SuperNEMO.
+Checks if OS is supported, checks that required system software is present,
+clones git repository.
+
+Requires a working network connection.
+
+Arguments:
+  -h                    Print this help message and exit
+  -p [DIR]              Install Cadfael.git bundle under DIR
+
+Exit status:
+  0  if OK
+  1  if any step failed
+
+Messages are logged to stdout/stderr as required.
+
+EOF
+}
 
 #-----------------------------------------------------------------------
 # Implementation
 main() {
+  local installPrefix=$(pwd)
+
+  while getopts ":hp:" opt ; do
+    case $opt in
+      p)
+        local installPrefix="$OPTARG"
+        ;;
+      h)
+        displayHelp
+        exit 0
+        ;;
+      \?)
+        displayUsage
+        _echo_error "Invalid option '-$OPTARG'"
+        ;;
+      :)
+        displayUsage
+        _echo_exit "Option '-$OPTARG' requires an argument"
+        ;;
+    esac
+  done
+
   _echo_info "Detected '$kOS' Operating System"
   _echo_info "Distribution '$kOSDISTRO ($kOSVERSION)'"
-
-  _echo_info "Running System Software Checks"
-  checkSystemSoftware $kOS
-
-  # - Get correct branch for this system
-  local cadfaelGitURL="linuxbrew"
-
-  if [ -n "$cadfaelGitURL" ] ; then
-    _echo_info "Cloning repo for $kOS"
-    pushd $installDir > /dev/null 2>&1
-    #git clone $cadfaelGitURL
-    popd > /dev/null 2>&1
-    _echo_info "Running first system diagnosis using doctor"
-    #"$installDir"/bin/brew doctor
-    _echo_info "If you see warnings above, follow their instructions and rerun 'brew doctor'"
+  if isSystemSupported "$kOSDISTRO-$kOSVERSION" ; then
+    _echo_info "System supported"
+    doCheckSystemSoftware || _echo_exit "System check failed"
   else
-    _echo_exit "No valid git repo found"
+    _echo_warning "Unsupported distribution '$kOSDISTRO' on '$kOS'
+    
+  Installation will proceed without system checks or initial bootstrapping
+  See further instructions at <url>
+  "
   fi
+
+  doGithubClone "$installPrefix" || _echo_exit "Failed to clone repo"
+
+  return 0
 }
 
-main
+main "$@"
 
