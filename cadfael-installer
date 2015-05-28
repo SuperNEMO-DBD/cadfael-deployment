@@ -52,8 +52,8 @@ readonly kCADFAELTAP="$kGITHUBORG/cadfael"
 
 # - Supported systems
 declare -a kSUPPORTEDSYSTEMS
-readonly kSUPPORTEDSYSTEMS=("Darwin-10.9"\
-                            "Darwin-10.10" \
+readonly kSUPPORTEDSYSTEMS=("MacOSX-10.9"\
+                            "MacOSX-10.10" \
                             "SUSELINUX-11" \
                             "Ubuntu-14.04")
 
@@ -62,14 +62,15 @@ readonly kOS=$(uname -s)
 
 case "$kOS" in
   "Darwin")
-    readonly kOSVERSION=$(sw_vers -productVersion)
+    readonly kOSDISTRO=$(sw_vers -productName | sed 's/ //g')
+    readonly kOSVERSION=$(sw_vers -productVersion | cut -d. -f1,2)
     readonly kPACKAGETOOL="pkg"
     ;;
   "Linux")
     # - Determine distro
     kLSB_RELEASE=$(command -v lsb_release)
     if [ -n "${kLSB_RELEASE}" ] ; then
-      readonly kOSDISTRO=$($kLSB_RELEASE -si | sed 's/ //')
+      readonly kOSDISTRO=$($kLSB_RELEASE -si | sed 's/ //g')
       readonly kOSVERSION=$($kLSB_RELEASE -sr)
     else
       # Long term, probably want to check existence of the
