@@ -182,6 +182,7 @@ checkDeb () {
 doCheckSystemSoftware () {
   case "$kOS" in
     "Darwin")
+      # See homebrew's installer for example of this
       _echo_warning "Not implemented: needs to check for xcode"
       return 0
       ;;
