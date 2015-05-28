@@ -240,6 +240,8 @@ Requires a working network connection.
 Arguments:
   -h                    Print this help message and exit
   -p [DIR]              Install Cadfael.git bundle under DIR
+                        If DIR is not provided, it defaults to the
+                        current working directory
 
 Exit status:
   0  if OK
@@ -271,6 +273,9 @@ main() {
       :)
         displayUsage
         _echo_exit "Option '-$OPTARG' requires an argument"
+        ;;
+      *)
+        _echo_exit "Internal command line parsing error"
         ;;
     esac
   done
