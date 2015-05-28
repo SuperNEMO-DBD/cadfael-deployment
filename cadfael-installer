@@ -123,6 +123,26 @@ isSystemSupported () {
   return 1
 }
 
+
+#-----------------------------------------------------------------------
+# - Absolute-ize supplied path, which may not exist
+#   On Linux, just use GNU readlink, on Mac, use Python
+#   This is messy, but BSD readlink doesn't support '-m'
+#   TODO: is there a pure Bash/POSIX way to do this?
+getAbsolutePath() {
+  case "$kOS" in
+    "Linux")
+      echo $(readlink -m "$1")
+      ;;
+    "Darwin")
+      echo $(python -c "import os,sys;print(os.path.realpath(sys.argv[1]))" "$1")
+      ;;
+    *)
+      _echo_exit "getAbsolutePath called on unsupported '$kOS'"
+      ;;
+  esac
+}
+
 #-----------------------------------------------------------------------
 # LINUX PACKAGE CHECKS
 # - Each supported system will have list of package names to be checked
@@ -215,7 +235,7 @@ doGithubClone () {
   esac
 
   local cloneurl="$baseurl/$reponame"
-  local clonedir=$(readlink -m "$1/Cadfael.git")
+  local clonedir=$(getAbsolutePath "$1/Cadfael.git")
 
   if [ -d "$clonedir" ] ; then
     _echo_exit "Installation destination exists"
