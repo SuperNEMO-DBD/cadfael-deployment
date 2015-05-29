@@ -54,6 +54,9 @@ readonly kCADFAELTAP="$kGITHUBORG/cadfael"
 declare -a kSUPPORTEDSYSTEMS
 readonly kSUPPORTEDSYSTEMS=("MacOSX-10.9"\
                             "MacOSX-10.10" \
+                            "CentOS-6.6" \
+                            "RedHatEnterpriseServer-6.6" \
+                            "RedHatEnterpriseDesktop-6.6" \
                             "SUSELINUX-11" \
                             "Ubuntu-14.04")
 
@@ -175,6 +178,84 @@ checkRPM () {
 # Check if a given deb package is installed
 checkDeb () {
   _echo_exit "checkDeb not implemented yet"
+}
+
+#-----------------------------------------------------------------------
+# Specific instances of RHEL
+doCheckRedHatEnterpriseServer-6.6 () {
+  doCheckRHEL6
+  return $?
+}
+
+doCheckRedHatEnterpriseDesktop-6.6 () {
+  doCheckRHEL6
+  return $?
+}
+
+doCheckCentOS-6.6 () {
+  doCheckRHEL6
+  return $?
+}
+
+
+#-----------------------------------------------------------------------
+# General Check RHEL based systems
+doCheckRHEL6 () {
+  _echo_info "Checking system software for RHEL6 ($kOSDISTRO)"
+
+  local rpmList=("curl.x86_64" \
+                 "git.x86_64" \
+                 "ruby-irb.x86_64" \
+                 "m4.x86_64" \
+                 "ruby.x86_64" \
+                 "texinfo.x86_64" \
+                 "bzip2-devel.x86_64" \
+                 "libcurl-devel.x86_64" \
+                 "expat-devel.x86_64" \
+                 "ncurses-devel.x86_64" \
+                 "zlib-devel.x86_64")
+
+  for pkg in "${rpmList[@]}"  ; do
+    if ! checkRPM $pkg ; then
+      local missingPkgs="$pkg ${missingPkgs}"
+    fi
+  done
+
+  # Yum groups
+  local devGroup="Development tools"
+  local devGroupSansSpace=$(echo $devGroup | tr -d '[:space:]')
+
+
+  if yum grouplist "$devGroup" 2>/dev/null | tr -d '[:space:]' | grep "InstalledGroups:$devGroupSansSpace" > /dev/null ; then
+    _echo_info "Checking for install of Yum Group '$devGroup': Installed"
+  else
+    _echo_error "Yum Group '$devGroup' is not installed"
+    local missingGroups="'$devGroup'"
+  fi
+
+  local returnVal=0
+
+  if [ -n "$missingPkgs" ] ; then
+    _echo_error "RPMs '$missingPkgs' are not installed on this system"
+    _echo_error "Please run (or get your sysadmin to run):
+
+  yum install $missingPkgs
+
+  "
+    returnVal=1
+  fi
+
+  if [ -n "$missingGroups" ] ; then
+    _echo_error "Yum Groups '$missingGroups' are not installed on this system"
+    _echo_error "Please run (or get your sysadmin to run):
+
+  yum groupinstall $missingGroups
+
+  "
+    returnVal=1
+  fi
+
+  return $returnVal
 }
 
 #-----------------------------------------------------------------------
