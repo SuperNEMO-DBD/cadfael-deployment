@@ -163,9 +163,11 @@ getAbsolutePath() {
 checkRPM () {
   isInstalled=$(rpm -q $1 --qf "%{NAME}-%{VERSION}-%{RELEASE}")
   if [ $? -eq 0 ] ; then
-    echo "$isInstalled"
+    _echo_info "Checking for install of rpm '$1': $isInstalled"
+    return 0
   else
-    echo "no"
+    _echo_error "RPM '$1' is not installed"
+    return 1
   fi
 }
 
@@ -176,24 +178,38 @@ checkDeb () {
 }
 
 #-----------------------------------------------------------------------
-# Example of loop over list of packages, with collection of missing ones
-#for pkg in $requiredPkgs ; do
-#  havePkg=$(checkRPM $pkg)
-#  _echo_info "checking that RPM '$pkg' is installed: $havePkg"
-#  if [ "$havePkg" = "no" ] ; then
-#    missingPkgs="$missingPkgs $pkg"
-#  fi
-#done
-#
-#if [ -n "$missingPkgs" ] ; then
-#  _echo_error "RPM packages '$missingPkgs' are not installed on this system"
-#  _echo_error "Please run (or get your sysadmin to run):
-#  
-#  yum install $missingPkgs
-#  "
-#  #_echo_exit "Unable to bootstrap: missing required system packages"
-#fi
-#}
+# SUSELINUX-11 check
+doCheckSUSELINUX-11 () {
+  _echo_info "Checking system software for 'SUSELINUX-11'"
+
+  local rpmList=("curl" \
+                 "git" \
+                 "m4" \
+                 "ruby" \
+                 "texinfo" \
+                 "libbz2-devel" \
+                 "libcurl-devel" \
+                 "libexpat-devel" \
+                 "ncurses-devel" \
+                 "zlib-devel")
+
+  for pkg in "${rpmList[@]}"  ; do
+    if ! checkRPM $pkg ; then
+      local missingPkgs="$pkg ${missingPkgs}"
+    fi
+  done
+
+  if [ -n "$missingPkgs" ] ; then
+    _echo_error "RPMs '$missingPkgs' are not installed on this system"
+    _echo_error "Please run (or get your sysadmin to run):
+
+  zypper install $missingPkgs
+  "
+    return 1
+  fi
+
+  return 0
+}
 
 #-----------------------------------------------------------------------
 # - Check that the OS provides the software on which brew relies
@@ -201,21 +217,18 @@ checkDeb () {
 #   that their installer also checks for Xcode
 #   On Linux, defer to more involved checking system
 doCheckSystemSoftware () {
-  case "$kOS" in
-    "Darwin")
-      # See homebrew's installer for example of this
-      _echo_warning "Not implemented: needs to check for xcode"
-      return 0
-      ;;
-    "Linux")
-      _echo_warning "Not implemented: check for rpms/debs"
-      return 0
-      ;;
-    *)
-      _echo_exit "doCheckSystemSoftware run with unknown OS '$kOS'"
-      return 1
-      ;;
-  esac
+  if isSystemSupported "$kOSDISTRO-$kOSVERSION" ; then
+    _echo_info "System supported"
+    doCheck"$kOSDISTRO-$kOSVERSION"
+    return $?
+  else
+    _echo_warning "Unsupported distribution '$kOSDISTRO' on '$kOS'
+
+  Installation will proceed without system checks or initial bootstrapping
+  See further instructions at <url>
+  "
+    return 0
+  fi
 }
 
 #-----------------------------------------------------------------------
@@ -239,7 +252,7 @@ doGithubClone () {
   local clonedir=$(getAbsolutePath "$1/Cadfael.git")
 
   if [ -d "$clonedir" ] ; then
-    _echo_exit "Installation destination exists"
+    _echo_exit "Installation destination '$clonedir' exists"
   fi
 
   _echo_info "Cloning '$reponame' into $clonedir"
@@ -261,8 +274,8 @@ doBrewSetup() {
 
   if ! PATH="$1/Cadfael.git/bin:$PATH" brew doctor ; then
     _echo_warning "brew doctor issued warnings
-  
-  These generally are not severe and can be ignored
+
+  These generally are not severe and can be ignored for now
 
   "
   fi
@@ -333,19 +346,10 @@ main() {
 
   _echo_info "Detected '$kOS' Operating System"
   _echo_info "Distribution '$kOSDISTRO ($kOSVERSION)'"
-  if isSystemSupported "$kOSDISTRO-$kOSVERSION" ; then
-    _echo_info "System supported"
-    doCheckSystemSoftware || _echo_exit "System check failed"
-  else
-    _echo_warning "Unsupported distribution '$kOSDISTRO' on '$kOS'
-    
-  Installation will proceed without system checks or initial bootstrapping
-  See further instructions at <url>
-  "
-  fi
 
-  doGithubClone "$installPrefix" || _echo_exit "Failed to clone repo"
-  doBrewSetup "$installPrefix" || _echo_exit "Brew setup failed"
+  doCheckSystemSoftware || _echo_exit "System software check failed"
+  doGithubClone "$installPrefix" || _echo_exit "Clone of Cadfael repo failed"
+  doBrewSetup "$installPrefix" || _echo_exit "Cadfael setup failed"
 
   return 0
 }
