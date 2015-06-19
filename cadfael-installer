@@ -293,6 +293,19 @@ doCheckSUSELINUX-11 () {
 }
 
 #-----------------------------------------------------------------------
+# DARWIN CHECKS
+#-----------------------------------------------------------------------
+# - OS X 10.10/Yosemite
+doCheckMacOSX-10.10 () {
+  developerDir=$(/usr/bin/xcode-select -print-path 2>/dev/null)
+  if [ -z "$developerDir" ] || [ ! -f "$developerDir/usr/bin/git" ] ; then
+    _echo_info "Installing the Command Line Tools (expect a GUI popup):"
+    sudo /usr/bin/xcode-select --install || _echo_exit "Failed to install Command Line Tools"
+  fi
+  return 0
+}
+
+#-----------------------------------------------------------------------
 # - Check that the OS provides the software on which brew relies
 #   On OSX, homebrew's doctor will handle this for us, though note
 #   that their installer also checks for Xcode
