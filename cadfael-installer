@@ -332,10 +332,10 @@ doGithubClone () {
   local reponame=""
   case "$kOS" in
     "Darwin")
-      reponame="homebrew.git"
+      reponame="cadfaelbrew.git"
       ;;
     "Linux")
-      reponame="linuxbrew.git"
+      reponame="cadfaelbrew.git"
       ;;
     *)
       _echo_exit "doGithubClone run with unknown kOS('$kOS')"
@@ -361,15 +361,15 @@ doBrewSetup() {
   _echo_info "setting up brew"
   if [ -z "$1" ] ; then _echo_exit "No install directory" ; fi
 
-  _echo_info "Tapping formulae from '$kCADFAELTAP'"
-  if ! PATH="$1/Cadfael.git/bin:$PATH" brew tap "$kCADFAELTAP" ; then
-    _echo_exit "failed to tap '$kCADFAELTAP'"
+  _echo_info "Updating cadfaelbrew"
+  if ! PATH="$1/Cadfael.git/bin:$PATH" brew update ; then
+    _echo_exit "failed to update cadfaelbrew from GitHub"
   fi
 
   if ! PATH="$1/Cadfael.git/bin:$PATH" brew doctor ; then
     _echo_warning "brew doctor issued warnings
 
-  These generally are not severe and can be ignored for now
+  These generally are not severe on a first pass and can be ignored for now
 
   "
   fi
