@@ -314,7 +314,8 @@ doCheckUbuntu-14.04 () {
                  "libbz2-dev" \
                  "libexpat-dev" \
                  "libncurses-dev" \
-                 "ruby2.0")
+                 "ruby2.0" \
+                 "zlib1g-dev")
 
   for pkg in "${debList[@]}"  ; do
     if ! checkDeb $pkg ; then
