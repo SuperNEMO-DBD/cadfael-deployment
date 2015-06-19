@@ -177,7 +177,15 @@ checkRPM () {
 #-----------------------------------------------------------------------
 # Check if a given deb package is installed
 checkDeb () {
-  _echo_exit "checkDeb not implemented yet"
+  isInstalled=$(dpkg-query -W -f='${Version} ${Status}' "$1")
+    if [ $? -eq 0 ] ; then
+    _echo_info "Checking for install of deb '$1': $isInstalled"
+    return 0
+  else
+    _echo_error "deb '$1' is not installed"
+    return 1
+  fi
+
 }
 
 #-----------------------------------------------------------------------
@@ -285,6 +293,40 @@ doCheckSUSELINUX-11 () {
     _echo_error "Please run (or get your sysadmin to run):
 
   zypper install $missingPkgs
+  "
+    return 1
+  fi
+
+  return 0
+}
+
+
+#-----------------------------------------------------------------------
+# Ubuntu Checks
+#-----------------------------------------------------------------------
+# 14.04 (Trusty LTS)
+doCheckUbuntu-14.04 () {
+  _echo_info "Checking system software for Ubuntu 14.04"
+
+  local debList=("build-essential" \
+                 "curl" \
+                 "git" \
+                 "libbz2-dev" \
+                 "libexpat-dev" \
+                 "libncurses-dev" \
+                 "ruby2.0")
+
+  for pkg in "${debList[@]}"  ; do
+    if ! checkDeb $pkg ; then
+      local missingPkgs="$pkg ${missingPkgs}"
+    fi
+  done
+
+  if [ -n "$missingPkgs" ] ; then
+    _echo_error "Debs '$missingPkgs' are not installed on this system"
+    _echo_error "Please run (or get your sysadmin to run):
+
+  apt-get install -y $missingPkgs
   "
     return 1
   fi
