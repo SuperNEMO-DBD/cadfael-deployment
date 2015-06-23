@@ -211,17 +211,9 @@ doCheckCentOS-6.6 () {
 doCheckRHEL6 () {
   _echo_info "Checking system software for RHEL6 ($kOSDISTRO)"
 
-  local rpmList=("curl.x86_64" \
-                 "git.x86_64" \
+  local rpmList=("git.x86_64" \
                  "ruby-irb.x86_64" \
-                 "m4.x86_64" \
-                 "ruby.x86_64" \
-                 "texinfo.x86_64" \
-                 "bzip2-devel.x86_64" \
-                 "libcurl-devel.x86_64" \
-                 "expat-devel.x86_64" \
-                 "ncurses-devel.x86_64" \
-                 "zlib-devel.x86_64")
+                 "HEP_OSlibs_SL6")
 
   for pkg in "${rpmList[@]}"  ; do
     if ! checkRPM $pkg ; then
@@ -311,10 +303,13 @@ doCheckUbuntu-14.04 () {
   local debList=("build-essential" \
                  "curl" \
                  "git" \
+                 "m4" \
                  "libbz2-dev" \
+                 "libcurl4-openssl-dev" \
                  "libexpat-dev" \
                  "libncurses-dev" \
                  "ruby2.0" \
+                 "texinfo" \
                  "zlib1g-dev")
 
   for pkg in "${debList[@]}"  ; do
