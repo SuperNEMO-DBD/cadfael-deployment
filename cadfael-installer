@@ -211,7 +211,8 @@ doCheckCentOS-6.6 () {
 doCheckRHEL6 () {
   _echo_info "Checking system software for RHEL6 ($kOSDISTRO)"
 
-  local rpmList=("git.x86_64" \
+  local rpmList=("expat-devel"
+                 "git.x86_64" \
                  "ruby-irb.x86_64" \
                  "HEP_OSlibs_SL6")
 
@@ -403,6 +404,18 @@ doBrewSetup() {
   if ! PATH="$1/Cadfael.git/bin:$PATH" brew update ; then
     _echo_exit "failed to update cadfaelbrew from GitHub"
   fi
+
+  # RHEL family distros don't require system compiler softlinks.
+  # We need these to bootstrap the system
+  case "$kOSDISTRO" in 
+    RedHat.*|CentOS|Scientific)
+      _echo_info "Creating system compiler softlinks for bootstrapping"
+      ln -s /usr/bin/gcc "$1/Cadfael.git/bin/gcc-$(/usr/bin/gcc -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
+      ln -s /usr/bin/g++ "$1/Cadfael.git/bin/g++-$(/usr/bin/g++ -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
+      ;;
+    *)
+      ;;
+  esac
 
   if ! PATH="$1/Cadfael.git/bin:$PATH" brew doctor ; then
     _echo_warning "brew doctor issued warnings
