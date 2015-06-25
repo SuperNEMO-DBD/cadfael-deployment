@@ -42,7 +42,7 @@ _echo_error()
 # GLOBAL VALUES/SETTINGS
 #-----------------------------------------------------------------------
 # - Self location and CWD
-readonly kCADFAELINSTALLERDIR=`dirname $0`
+readonly kCADFAELINSTALLERDIR=`dirname "$0"`
 readonly kWORKINGDIR=`pwd`
 
 # - Github baseurl
@@ -51,14 +51,15 @@ readonly kGITHUBURL="https://github.com/$kGITHUBORG"
 readonly kCADFAELTAP="$kGITHUBORG/cadfael"
 
 # - Supported systems
+# Use regexs to simplify distro family support. Split out into distinct
+# members when needed.
+readonly _kRHELIDREGEX='(RedHatEnterprise[[:alpha:]]*|CentOS|Scientific[[:alpha:]]*)'
+
 declare -a kSUPPORTEDSYSTEMS
-readonly kSUPPORTEDSYSTEMS=("MacOSX-10.9"\
-                            "MacOSX-10.10" \
-                            "CentOS-6.6" \
-                            "RedHatEnterpriseServer-6.6" \
-                            "RedHatEnterpriseDesktop-6.6" \
+readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(9|10)" \
+                            "${_kRHELIDREGEX}-[5-6]\.[0-9][0-9]?" \
                             "SUSELINUX-11" \
-                            "Ubuntu-14.04")
+                            "Ubuntu-14\.04")
 
 # - Operating System ID, Version and Packaging System
 readonly kOS=$(uname -s)
@@ -83,21 +84,26 @@ case "$kOS" in
     fi
 
     # - Determine package/manager system
-    if [[ "$kOSDISTRO" == "Debian|Ubuntu" ]] ; then
-      readonly kPACKAGETOOL="dpkg"
-      readonly kPACKAGEMANAGER="apt"
-    elif [[ "$kOSDISTRO" == "RedHat.*|CentOS|Scientific" ]] ; then
-      readonly kPACKAGETOOL="rpm"
-      readonly kPACKAGETOOL="yum"
-    elif [[ "$kOSDISTRO" == "SUSELINUX" ]] ; then
-      readonly kPACKAGETOOL="rpm"
-      readonly kPACKAGEMANAGER="zypper"
-    else
-      # Can only mark as empty and warn later on that no packages can
-      # be checked
-      readonly kPACKAGETOOL=""
-      readonly kPACKAGEMANAGER=""
-    fi
+    case "$kOSDISTRO" in 
+      Debian|Ubuntu)
+        readonly kPACKAGETOOL="dpkg"
+        readonly kPACKAGEMANAGER="apt-get"
+        ;;
+      RedHat.*|CentOS|Scientific.*)
+        readonly kPACKAGETOOL="rpm"
+        readonly kPACKAGEMANAGER="yum"
+        ;;
+      SUSELINUX)
+        readonly kPACKAGETOOL="rpm"
+        readonly kPACKAGEMANAGER="zypper"
+        ;;
+      *)
+        # Can only mark as empty and warn later on that no packages can
+        # be checked
+        readonly kPACKAGETOOL="<unknown:packagetool>"
+        readonly kPACKAGEMANAGER="<unknown:packagemanager>"
+        ;;
+    esac
     ;;
   *)
     # A hard fail here because we really can't progress any further
@@ -122,11 +128,29 @@ fi
 isSystemSupported () {
   local elem
   for elem in "${kSUPPORTEDSYSTEMS[@]}" ; do
-    [[ "$elem" == "$1" ]] && return 0
+    [[ "$1" =~ $elem ]] && return 0
   done
   return 1
 }
 
+#-----------------------------------------------------------------------
+# Redhat/CentOS/Scientifc form a family of distros, so we treat these
+# as a single distro for now, only distinguished by major version number
+# - Return true if OS is RedHat Family
+isRedHatFamily () {
+  [[ "$kOSDISTRO" =~ $_kRHELIDREGEX ]] && return 0
+  return 1
+}
+
+# Get the RedHat major version
+getRedHatMajorVersion () {
+  if isRedHatFamily ; then
+    echo "$(echo $kOSVERSION | cut -d. -f1)"
+    return 0
+  fi
+  echo "NOTREDHAT"
+  return 1
+}
 
 #-----------------------------------------------------------------------
 # - Absolute-ize supplied path, which may not exist
@@ -188,28 +212,11 @@ checkDeb () {
 
 }
 
-#-----------------------------------------------------------------------
-# Specific instances of RHEL
-doCheckRedHatEnterpriseServer-6.6 () {
-  doCheckRHEL6
-  return $?
-}
-
-doCheckRedHatEnterpriseDesktop-6.6 () {
-  doCheckRHEL6
-  return $?
-}
-
-doCheckCentOS-6.6 () {
-  doCheckRHEL6
-  return $?
-}
-
 
 #-----------------------------------------------------------------------
-# General Check RHEL based systems
-doCheckRHEL6 () {
-  _echo_info "Checking system software for RHEL6 ($kOSDISTRO)"
+# General Check for RHEL6 based systems
+doCheckRedHat-6 () {
+  _echo_info "Checking system software for RedHat6 ($kOSDISTRO)"
 
   local rpmList=("expat-devel"
                  "git.x86_64" \
@@ -240,7 +247,7 @@ doCheckRHEL6 () {
     _echo_error "RPMs '$missingPkgs' are not installed on this system"
     _echo_error "Please run (or get your sysadmin to run):
 
-  yum install $missingPkgs
+  $kPACKAGEMANAGER install $missingPkgs
 
   "
     returnVal=1
@@ -285,7 +292,7 @@ doCheckSUSELINUX-11 () {
     _echo_error "RPMs '$missingPkgs' are not installed on this system"
     _echo_error "Please run (or get your sysadmin to run):
 
-  zypper install $missingPkgs
+  $kPACKAGEMANAGER install $missingPkgs
   "
     return 1
   fi
@@ -323,7 +330,7 @@ doCheckUbuntu-14.04 () {
     _echo_error "Debs '$missingPkgs' are not installed on this system"
     _echo_error "Please run (or get your sysadmin to run):
 
-  apt-get install -y $missingPkgs
+  $kPACKAGEMANAGER install -y $missingPkgs
   "
     return 1
   fi
@@ -344,6 +351,29 @@ doCheckMacOSX-10.10 () {
   return 0
 }
 
+# - OS X 10.9/Mavericks
+doCheckMacOSX-10.9 () {
+  doCheckMacOSX-10.10
+  return $?
+}
+
+#-----------------------------------------------------------------------
+# Get system software checking function for supplied system
+getSystemCheckFunction () {
+  if isRedHatFamily ; then
+    local majorVersion=$(getRedHatMajorVersion)
+    echo "doCheckRedHat-$majorVersion"
+    return 0
+  else
+    echo "doCheck$1"
+    return 0
+  fi
+
+  _echo_error "No valid checking function for '$1'"
+  return 1
+}
+
+
 #-----------------------------------------------------------------------
 # - Check that the OS provides the software on which brew relies
 #   On OSX, homebrew's doctor will handle this for us, though note
@@ -352,10 +382,10 @@ doCheckMacOSX-10.10 () {
 doCheckSystemSoftware () {
   if isSystemSupported "$kOSDISTRO-$kOSVERSION" ; then
     _echo_info "System supported"
-    doCheck"$kOSDISTRO-$kOSVERSION"
+    $(getSystemCheckFunction "$kOSDISTRO-$kOSVERSION")
     return $?
   else
-    _echo_warning "Unsupported distribution '$kOSDISTRO' on '$kOS'
+    _echo_warning "Unsupported distribution '$kOSDISTRO' ($kOSVERSION) on '$kOS'
 
   Installation will proceed without system checks or initial bootstrapping
   See further instructions at <url>
@@ -407,21 +437,19 @@ doBrewSetup() {
 
   # RHEL family distros don't require system compiler softlinks.
   # We need these to bootstrap the system
-  case "$kOSDISTRO" in 
-    RedHat.*|CentOS|Scientific)
-      _echo_info "Creating system compiler softlinks for bootstrapping"
-      ln -s /usr/bin/gcc "$1/Cadfael.git/bin/gcc-$(/usr/bin/gcc -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
-      ln -s /usr/bin/g++ "$1/Cadfael.git/bin/g++-$(/usr/bin/g++ -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
-      ;;
-    *)
-      ;;
-  esac
+  if isRedHatFamily ; then 
+    _echo_info "Creating system compiler softlinks for bootstrapping"
+    ln -s /usr/bin/gcc "$1/Cadfael.git/bin/gcc-$(/usr/bin/gcc -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
+    ln -s /usr/bin/g++ "$1/Cadfael.git/bin/g++-$(/usr/bin/g++ -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
+  fi
 
   if ! PATH="$1/Cadfael.git/bin:$PATH" brew doctor ; then
     _echo_warning "brew doctor issued warnings
 
-  These generally are not severe on a first pass and can be ignored for now
-
+  These generally are not severe on a first pass on supported platforms and
+  can be ignored for now.
+ 
+  If you're installing on an unsupported platform, please review them.
   "
   fi
 
