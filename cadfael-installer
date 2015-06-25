@@ -216,7 +216,7 @@ checkDeb () {
 #-----------------------------------------------------------------------
 # General Checks for RHEL based systems
 # - RHEL 5.X
-doCheckRedhat-5 () {
+doCheckRedHat-5 () {
   _echo_info "Checking system software for RedHat5 ($kOSDISTRO)"
   local rpmList=("expat-devel" \
                  "git" \
