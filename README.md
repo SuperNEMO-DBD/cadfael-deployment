@@ -1,5 +1,32 @@
 # cadfael-installer
-Installer for CadfaelBrew
+Bootstrap installer for [CadfaelBrew](https://github.com/SuperNEMO-DBD/cadfaelbrew.git),
+the SuperNEMO experiment's fork of the [Linuxbrew](http://brew.sh/linuxbrew) software package manager. This bootstrap script is provided
+to help users get a base install of CadfaelBrew up and running on
+Linux and OS X platforms. It handles checks for required system
+packages, bootstrapping of any new versions of core packages like
+git and Ruby, and the basic cloning and updating of brew itself.
+
+Below we provide instructions and requirements for using this installer.
+Also provided are the 'from scratch' steps underlying the installer script.
+These are most useful if you're running on an unsupported system and
+want to try testing cadfaelbrew to this.
+
+# Supported Systems
+## Mainline
+As with upstream linuxbrew, only 64bit systems are supported.
+
+- Mac OS X 10.9, 10.10
+- Linux Distributions:
+  - RHEL/CentOS 6.X, 7.X
+  - Scientific Linux 6.X
+  - Ubuntu 14.04
+
+## Deprecated
+Supported on a 'best effort' basis, largely to allow us on older cluster
+systems.
+
+- RHEL/CentOS/Scientific Linux 5.X
+
 
 # Package Lists
 Lists of prerequisite packages are derived from the minimal list
