@@ -230,7 +230,7 @@ doCheckRedHat-5 () {
   done
 
   # Yum groups
-  local devGroup="Development tools"
+  local devGroup="Development [tT]tools"
   local devGroupSansSpace=$(echo $devGroup | tr -d '[:space:]')
 
 
