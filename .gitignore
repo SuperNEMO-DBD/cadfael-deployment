@@ -1,9 +1,9 @@
 # Ignore everything
-*
+/*
 
 # Except these...
 !.gitignore
 !cadfael-installer
 !LICENSE
 !README.md
-
+!/containers/

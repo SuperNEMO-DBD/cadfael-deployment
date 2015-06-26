@@ -98,3 +98,7 @@ Brew requires a Ruby with at least:
 - openssl support
 
 
+# Containers
+This directory holds files for building Linux containers for testing
+installs of Cadfael on supported platforms.
+
