@@ -212,14 +212,17 @@ checkDeb () {
 
 }
 
-
 #-----------------------------------------------------------------------
 # General Checks for RHEL based systems
 # - RHEL 5.X
 doCheckRedHat-5 () {
   _echo_info "Checking system software for RedHat5 ($kOSDISTRO)"
   local rpmList=("expat-devel" \
+                 "gcc44" \
+                 "gcc44-c++" \
+                 "gcc44-gfortran" \
                  "git" \
+                 "glibc-devel" \
                  "HEP_OSlibs_SL5" \
                  "ruby-irb" \
                  "redhat-lsb")
@@ -410,6 +413,45 @@ doCheckMacOSX-10.9 () {
 }
 
 #-----------------------------------------------------------------------
+# CADFAEL BREW SETUP
+#-----------------------------------------------------------------------
+# - Does the system supply a suitable Ruby version?
+isSystemRubySuitable () {
+  local minRequiredMajor="1"
+  local minRequiredMinor="9"
+
+  local systemRubyVersion=$(ruby --version | cut -d" " -f2)
+  local systemRubyVersionMajor=$(echo $systemRubyVersion | cut -d. -f1)
+  local systemRubyVersionMinor=$(echo $systemRubyVersion | cut -d. -f2)
+
+  _echo_info "System ruby (`which ruby`) version : $systemRubyVersionMajor.$systemRubyVersionMinor"
+
+  [[ "$systemRubyVersionMajor" -gt "$minRequiredMajor" ]] && return 0
+  [[ "$systemRubyVersionMajor" -eq "$minRequiredMajor" ]] && \
+    [[ "$systemRubyVersionMinor" -ge "$minRequiredMinor" ]] && return 0
+
+  return 1;
+}
+
+# - Bootstrap a temporary Ruby install to update brew, then brew install
+# ruby
+# - Temporarily use postmodern's ruby-install 
+doBootstrapRuby () {
+  local rubyBSDir="$1"
+  local rubySrcDir="$rubyBSDir/src"
+  git clone https://github.com/postmodern/ruby-install.git "$rubyBSDir"
+  "$rubyBSDir"/bin/ruby-install \
+    -j4 \
+    -i "$rubyBSDir" \
+    -s "$rubySrcDir" \
+    --no-install-deps \
+    ruby 2.0 -- \
+    --disable-install-doc || return 1
+  return 0
+}
+
+
+#-----------------------------------------------------------------------
 # Get system software checking function for supplied system
 getSystemCheckFunction () {
   if isRedHatFamily ; then
@@ -424,7 +466,6 @@ getSystemCheckFunction () {
   _echo_error "No valid checking function for '$1'"
   return 1
 }
-
 
 #-----------------------------------------------------------------------
 # - Check that the OS provides the software on which brew relies
@@ -476,26 +517,44 @@ doGithubClone () {
 }
 
 #-----------------------------------------------------------------------
+# Create compiler softlinks on RHEL platforms 
+# brew requires GCCs to be named 'gcc-<version>'
+doCreateCompilerLinks () {
+  if isRedHatFamily ; then 
+    _echo_info "Creating system compiler softlinks for bootstrapping"
+    if [ `getRedHatMajorVersion` == "5" ] ; then
+      gcc_suffix="44";
+    fi
+
+    ln -s /usr/bin/gcc${gcc_suffix} "$1/Cadfael.git/bin/gcc-$(/usr/bin/gcc -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
+    ln -s /usr/bin/g++${gcc_suffix} "$1/Cadfael.git/bin/g++-$(/usr/bin/g++ -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
+  fi
+}
+
+
+#-----------------------------------------------------------------------
 # Perform initial setup of Brew
 # Tap Cadfael, run doctor
 doBrewSetup() {
   _echo_info "setting up brew"
   if [ -z "$1" ] ; then _echo_exit "No install directory" ; fi
 
+  doCreateCompilerLinks $1
+
+  # - Is system Ruby sufficient?
+  local rubyBootstrap="$1/Cadfael.git/.rubybs"
+  if ! isSystemRubySuitable ; then
+    _echo_info "Bootstrapping ruby"
+    doBootstrapRuby "$rubyBootstrap" || _echo_exit "Unable to bootstrap ruby"
+  fi
+
   _echo_info "Updating cadfaelbrew"
-  if ! PATH="$1/Cadfael.git/bin:$PATH" brew update ; then
+  if ! PATH="$1/Cadfael.git/bin:$rubyBootstrap/bin:$PATH" brew update ; then
     _echo_exit "failed to update cadfaelbrew from GitHub"
   fi
 
-  # RHEL family distros don't require system compiler softlinks.
-  # We need these to bootstrap the system
-  if isRedHatFamily ; then 
-    _echo_info "Creating system compiler softlinks for bootstrapping"
-    ln -s /usr/bin/gcc "$1/Cadfael.git/bin/gcc-$(/usr/bin/gcc -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
-    ln -s /usr/bin/g++ "$1/Cadfael.git/bin/g++-$(/usr/bin/g++ -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
-  fi
 
-  if ! PATH="$1/Cadfael.git/bin:$PATH" brew doctor ; then
+  if ! PATH="$1/Cadfael.git/bin:$rubyBootstrap/bin:$PATH" brew doctor ; then
     _echo_warning "brew doctor issued warnings
 
   These generally are not severe on a first pass on supported platforms and
@@ -503,6 +562,18 @@ doBrewSetup() {
  
   If you're installing on an unsupported platform, please review them.
   "
+  fi
+
+  # Now ready, roughly, to brew ruby if bootstrap was done
+  if [ -d "$rubyBootstrap" ] ; then
+    _echo_info "Brewing ruby"
+    if ! PATH="$1/Cadfael.git/bin:$rubyBootstrap/bin:$PATH" brew install ruby ; then
+      _echo_exit "failed to brew ruby"
+    fi
+
+    # Remove the bootstrap
+    rm -Rf "$rubyBootstrap" || _echo_warning "Failed to remove bootstrapped Ruby under '$rubyBootstrap'"
+    _echo_info "Brewing of Ruby complete"
   fi
 
   return 0
@@ -575,6 +646,8 @@ main() {
   doCheckSystemSoftware || _echo_exit "System software check failed"
   doGithubClone "$installPrefix" || _echo_exit "Clone of Cadfael repo failed"
   doBrewSetup "$installPrefix" || _echo_exit "Cadfael setup failed"
+
+  _echo_info "Cadfael install complete under '$installPrefix'"
 
   return 0
 }
