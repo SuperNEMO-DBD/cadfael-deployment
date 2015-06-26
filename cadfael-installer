@@ -526,8 +526,8 @@ doCreateCompilerLinks () {
       gcc_suffix="44";
     fi
 
-    ln -s /usr/bin/gcc${gcc_suffix} "$1/Cadfael.git/bin/gcc-$(/usr/bin/gcc -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
-    ln -s /usr/bin/g++${gcc_suffix} "$1/Cadfael.git/bin/g++-$(/usr/bin/g++ -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
+    ln -s /usr/bin/gcc${gcc_suffix} "$1/Cadfael.git/bin/gcc-$(/usr/bin/gcc${gcc_suffix} -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
+    ln -s /usr/bin/g++${gcc_suffix} "$1/Cadfael.git/bin/g++-$(/usr/bin/g++${gcc_suffix} -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
   fi
 }
 
