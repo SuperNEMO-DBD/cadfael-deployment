@@ -27,7 +27,6 @@ systems.
 
 - RHEL/CentOS/Scientific Linux 5.X
 
-
 # Package Lists
 Lists of prerequisite packages are derived from the minimal list
 required by homebrew itself, *plus* any required from our own
@@ -91,4 +90,11 @@ libxext-dev \
 libpng-dev \
 libjpeg-dev
 ```
+
+## Bootstrapping of Ruby
+If a bootstrap of Ruby is required, additional packages may be needed.
+Brew requires a Ruby with at least:
+
+- openssl support
+
 
