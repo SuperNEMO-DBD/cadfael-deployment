@@ -77,7 +77,7 @@ texinfo \
 zlib1g-dev
 ```
 
-Additional packages to fully support Cadfael:
+Additional packages to fully support CadfaelBrew:
 
 - For Root5 visualization
 
@@ -91,11 +91,26 @@ libpng-dev \
 libjpeg-dev
 ```
 
-## Bootstrapping of Ruby
-If a bootstrap of Ruby is required, additional packages may be needed.
-Brew requires a Ruby with at least:
+# Installing CadfaelBrew
+You will require a working network connection in order to clone the CadfaelBrew repository and subsequently install any packages. Simply run the `cadfael-installer` script from the command line, optionally passing an installation prefix. For example, to install CadfaelBrew under the current working directory, simply do:
 
-- openssl support
+```
+$ ./cadfael-installer
+```
+
+or to install to, say, a directory `$HOME/supernemo`, do
+
+```
+$ ./cadfael-installer -p $HOME/supernemo
+```
+
+In both cases, a subdirectory `Cadfael.git` will be created to hold the installation.
+
+The script will check that your system is supported and provides the needed system packages used by Cadfael. 
+Any missing packages will be reported together with instructions on installing them (this may need to be done by your sysadmin if you don't have sufficient priveleges on the system). For certain older systems that do not provide a sufficiently recent version of the Ruby language that CadfaelBrew is written in, this will be bootstrapped.
+Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
+The CadfaelBrew repository will 
+
 
 
 # Containers
