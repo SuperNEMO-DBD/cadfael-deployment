@@ -1,21 +1,23 @@
 # cadfael-installer
 Bootstrap installer for [CadfaelBrew](https://github.com/SuperNEMO-DBD/cadfaelbrew.git),
-the SuperNEMO experiment's fork of the [Linuxbrew](http://brew.sh/linuxbrew) software package manager. This bootstrap script is provided
+the SuperNEMO experiment's fork of the [Linuxbrew](http://brew.sh/linuxbrew)/[Homebrew](https://brew.sh) 
+software package manager. This bootstrap script is provided
 to help users get a base install of CadfaelBrew up and running on
 Linux and OS X platforms. It handles checks for required system
 packages, bootstrapping of any new versions of core packages like
 git and Ruby, and the basic cloning and updating of brew itself.
 
-Below we provide instructions and requirements for using this installer.
+Below we provide OS/software requirements for using CadfaelBrew, followed
+by instructions on running the installer to get the base system up and running.
 Also provided are the 'from scratch' steps underlying the installer script.
 These are most useful if you're running on an unsupported system and
-want to try testing cadfaelbrew to this.
+want to try testing CadfaelBrew to this.
 
 # Supported Systems
 ## Mainline
 As with upstream linuxbrew, only 64bit systems are supported.
 
-- Mac OS X 10.9, 10.10
+- Mac OS X 10.9 (Mavericks), 10.10 (Yosemite)
 - Linux Distributions:
   - RHEL/CentOS 6.X, 7.X
   - Scientific Linux 6.X
@@ -26,6 +28,13 @@ Supported on a 'best effort' basis, largely to allow us on older cluster
 systems.
 
 - RHEL/CentOS/Scientific Linux 5.X
+
+## Work in Progress
+These are known upcoming systems that will be supported but are currently
+not supported by upstream Homebrew/Linuxbrew or are not at the release
+stage.
+
+- Mac OS X 10.11 (El Capitan)
 
 # Package Lists
 Lists of prerequisite packages are derived from the minimal list
@@ -91,7 +100,7 @@ libpng-dev \
 libjpeg-dev
 ```
 
-# Installing CadfaelBrew
+# Installing CadfaelBrew using `cadfael-installer`
 You will require a working network connection in order to clone the CadfaelBrew repository and subsequently install any packages. Simply run the `cadfael-installer` script from the command line, optionally passing an installation prefix. For example, to install CadfaelBrew under the current working directory, simply do:
 
 ```
@@ -109,11 +118,12 @@ In both cases, a subdirectory `Cadfael.git` will be created to hold the installa
 The script will check that your system is supported and provides the needed system packages used by Cadfael. 
 Any missing packages will be reported together with instructions on installing them (this may need to be done by your sysadmin if you don't have sufficient priveleges on the system). For certain older systems that do not provide a sufficiently recent version of the Ruby language that CadfaelBrew is written in, this will be bootstrapped.
 Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
-The CadfaelBrew repository will 
 
+# Installing CadfaelBrew by Hand
 
 
 # Containers
 This directory holds files for building Linux containers for testing
-installs of Cadfael on supported platforms.
+installs of Cadfael on supported platforms. This is a work in progress
+and at present only Docker containers are used.
 
