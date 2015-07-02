@@ -47,6 +47,21 @@ Lists of prerequisite packages are given below and are derived from the minimal
 list required by homebrew itself, *plus* any required from our own
 packages.
 
+## Homebrew Requirements
+Homebrew is written in the [Ruby language](https://www.ruby-lang.org/en/) and
+uses the [git](https://git-scm.com) version control system for distributing
+updates. The minimum requirements to run the `brew` command are thus:
+
+- Ruby 1.9 or higher
+- git 1.7 or higher
+
+Homebrew are gradually removing support for Ruby versions less than 2.0, though these have
+not been merged into CadfaelBrew yet. The installer script will bootstrap
+a temporary local Ruby install if the system package manager cannot supply
+a sufficient version. It will then use `brew` itself to install the
+Homebrew Ruby for permanent use. So far no issues have been encountered
+with Git versions, though this can also be bootstrapped in future if required.
+
 ## Mac OS X (Mavericks and higher)
 Only what homebrew itself requires - OS X plus Xcode. The latter 
 may be installed through the [App Store](https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12),
@@ -83,6 +98,9 @@ and for 7 series:
 $ TOBECHECKED
 ```
 
+Note that these are not the *complete* list
+of packages required, simply the additional set needed to be installed on top
+of a base install. Yum will pull in all needed dependencies.
 Note that `HEP_OSlibs*` rpms are provided by repos at CERN, so this needs to
 be added in your `yum` configuration (TODO Docs).
 
