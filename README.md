@@ -13,8 +13,8 @@ Also provided are the 'from scratch' steps underlying the installer script.
 These are most useful if you're running on an unsupported system and
 want to try testing CadfaelBrew to this.
 
-# Supported Systems
-## Mainline
+# Systems Supported by CadfaelBrew
+## Supported
 As with upstream linuxbrew, only 64bit systems are supported.
 
 - Mac OS X 10.9 (Mavericks), 10.10 (Yosemite)
@@ -35,28 +35,40 @@ not supported by upstream Homebrew/Linuxbrew or are not at the release
 stage.
 
 - Mac OS X 10.11 (El Capitan)
+  - Currently in Beta 
+- Scientific Linux 7
+  - Expected to be no different from RHEL/CentOS7 but requires testing
 
-# Package Lists
-Lists of prerequisite packages are derived from the minimal list
-required by homebrew itself, *plus* any required from our own
+# System Package Requirements
+Though CadfaelBrew provides a wide range of software packages, it
+is not completely standalone and needs a base set of software
+to be installed through the system package manager (yum/apt/App Store etc)
+Lists of prerequisite packages are given below and are derived from the minimal 
+list required by homebrew itself, *plus* any required from our own
 packages.
 
 ## Mac OS X (Mavericks and higher)
-Only what homebrew itself requires - OS X plus Xcode. At present, we
-don't require Xquartz, preferring Cocoa and Qt (to be reviewed).
+Only what homebrew itself requires - OS X plus Xcode. The latter 
+may be installed through the [App Store](https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12),
+though `cadfael-installer` will offer to install it for you if it is not present
+when you run the installer script.
 
+At present, we don't require Xquartz(X11), for graphical displays, preferring 
+Cocoa and Qt as these are supported by ROOT and Geant4 respectively.
+
+## Linux Distributions
 As homebrew supports OS X, support on other UNIX platforms is based
 on trying to match the base system software supplied by Apple.
 
 ## RHEL/CentOS/SL 6/7
-We'll try and use the `HEP_OSlibs" metapackage here as this is should always
-be installed on Grid nodes. Plus it makes it easy for deployment on other
-systems.
-
-Basic list identified as
+We base the use the [`HEP_OSlibs`](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) 
+metapackage here as this is should always be installed on Grid nodes. 
+Plus it makes it easy for deployment on other systems. However, it is not
+totally complete, so the basic list of rpms on the 6 series is:
 
 ```
-$ yum install -y expat-devel \
+$ yum install -y \
+expat-devel \
 git \
 HEP_OSlibs_SL6 \
 ruby-irb \
@@ -65,8 +77,14 @@ redhat-lsb-core
 $ yum groupinstall -y 'Development tools'
 ```
 
-Note that `HEP_OSlibs_SL6` is provided by a CERN repo, so this needs to
-be added (TODO Docs).
+and for 7 series:
+
+```
+$ TOBECHECKED
+```
+
+Note that `HEP_OSlibs*` rpms are provided by repos at CERN, so this needs to
+be added in your `yum` configuration (TODO Docs).
 
 ## Ubuntu 14.04 LTS
 Required by homebrew:
