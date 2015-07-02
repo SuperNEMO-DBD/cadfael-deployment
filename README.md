@@ -17,11 +17,11 @@ want to try testing CadfaelBrew to this.
 ## Supported
 As with upstream linuxbrew, only 64bit systems are supported.
 
-- Mac OS X 10.9 (Mavericks), 10.10 (Yosemite)
+- [Mac OS X](https://www.apple.com/osx/) 10.9 (Mavericks), 10.10 (Yosemite)
 - Linux Distributions:
-  - RHEL/CentOS 6.X, 7.X
-  - Scientific Linux 6.X
-  - Ubuntu 14.04
+  - [RHEL](http://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)/[CentOS](https://www.centos.org) 6.X, 7.X
+  - [Scientific Linux](https://www.scientificlinux.org) 6.X
+  - [Ubuntu](http://www.ubuntu.com) 14.04LTS
 
 ## Deprecated
 Supported on a 'best effort' basis, largely to allow us on older cluster
@@ -35,9 +35,11 @@ not supported by upstream Homebrew/Linuxbrew or are not at the release
 stage.
 
 - Mac OS X 10.11 (El Capitan)
-  - Currently in Beta 
+  - Currently in Beta, release expected Autumn 2015
 - Scientific Linux 7
   - Expected to be no different from RHEL/CentOS7 but requires testing
+- Ubuntu 16.04LTS
+  - Next LTS (Long Term Support) version. Expected Spring 2016
 
 # System Package Requirements
 Though CadfaelBrew provides a wide range of software packages, it
