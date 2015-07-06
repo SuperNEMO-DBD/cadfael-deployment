@@ -6,6 +6,7 @@ ADD HEP_OSlibs.repo /etc/yum.repos.d/HEP_OSlibs.repo
 RUN yum update -y && \
   yum clean all && \
   yum install -y \
+    bzip2-devel \
     HEP_OSlibs_SL5 \
     expat-devel \
     gcc44 \
@@ -15,7 +16,18 @@ RUN yum update -y && \
     git \
     openssl-devel \
     ruby-irb \
-    redhat-lsb && \
+    redhat-lsb \
+    mesa-libGL-devel \
+    mesa-libGLU-devel \
+    ncurses-devel \
+    libX11-devel \
+    libXau-devel \
+    libXdamage-devel \
+    libXdmcp-devel \
+    libXext-devel \
+    libXfixes-devel \
+    libXft-devel \
+    libXpm-devel && \
   yum groupinstall -y "Development Tools"
 
 # Create user

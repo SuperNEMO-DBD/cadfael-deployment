@@ -225,7 +225,18 @@ doCheckRedHat-5 () {
                  "glibc-devel" \
                  "HEP_OSlibs_SL5" \
                  "ruby-irb" \
-                 "redhat-lsb")
+                 "redhat-lsb" \
+                 "mesa-libGL-devel" \
+                 "mesa-libGLU-devel" \
+                 "ncurses-devel" \
+                 "libX11-devel" \
+                 "libXau-devel" \
+                 "libXdamage-devel" \
+                 "libXdmcp-devel" \
+                 "libXext-devel" \
+                 "libXfixes-devel" \
+                 "libXft-devel" \
+                 "libXpm-devel")
   for pkg in "${rpmList[@]}"  ; do
     if ! checkRPM $pkg ; then
       local missingPkgs="$pkg ${missingPkgs}"

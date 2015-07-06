@@ -138,6 +138,39 @@ libpng-dev \
 libjpeg-dev
 ```
 
+## RedHat/CentOS/SL 5
+So far identified (main gotcha is that `HEP_OSlibs_SL5` does *not* provide
+X11, GL, ncurses devel packages).
+
+```
+$ yum install -y \
+bzip2-devel \
+HEP_OSlibs_SL5 \
+expat-devel \
+gcc44 \
+gcc44-c++ \
+gcc44-gfortran \
+glibc-devel \
+git \
+openssl-devel \
+ruby-irb \
+redhat-lsb \
+mesa-libGL-devel \
+mesa-libGLU-devel \
+ncurses-devel \
+libX11-devel \
+libXau-devel \
+libXdamage-devel \
+libXdmcp-devel \
+libXext-devel \
+libXfixes-devel \
+libXft-devel \
+libXpm-devel
+
+$ yum groupinstall -y "Development Tools"
+```
+
+
 # Installing CadfaelBrew using `cadfael-installer`
 You will require a working network connection in order to clone the CadfaelBrew repository and subsequently install any packages. Simply run the `cadfael-installer` script from the command line, optionally passing an installation prefix. For example, to install CadfaelBrew under the current working directory, simply do:
 
