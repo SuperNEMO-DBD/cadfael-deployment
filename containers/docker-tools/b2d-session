@@ -9,18 +9,24 @@ function error_exit {
   exit 1
 }
 
-[[ `uname -a` == "Darwin" ]] || error_exit "b2d-session only runs on Mac"
+[[ `uname` == "Darwin" ]] || error_exit "b2d-session only runs on Mac"
 
 # Start up...
 b2d=$(command -v boot2docker) || error_exit "No boot2docker command found"
 
+# Are we running already?
+b2d_status=$($b2d status)
+
 # Cycle VM, use at least 5GB of memory
-$b2d down
-$b2d delete
-$b2d init -m 5120
-$b2d up || error_exit "Could not start boot2docker VM"
+if [ "$b2d_status" == "poweroff" ] ; then
+  $b2d down
+  $b2d delete
+  $b2d init -m 5120
+  $b2d up || error_exit "Could not start boot2docker VM"
+fi
+
 eval "$($b2d shellinit)"
 bash -i
-echo "Shutting down boot2docker..."
+echo "Exiting boot2docker session"
 $b2d down
 exit $?
