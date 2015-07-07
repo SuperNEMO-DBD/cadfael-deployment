@@ -301,7 +301,7 @@ doCheckRedHat-6 () {
   local devGroupSansSpace=$(echo $devGroup | tr -d '[:space:]')
 
 
-  if yum grouplist "$devGroup" 2>/dev/null | tr -d '[:space:]' | grep "InstalledGroups:$devGroupSansSpace" > /dev/null ; then
+  if yum grouplist "$devGroup" 2>/dev/null | tr -d '[:space:]' | grep -i "InstalledGroups:$devGroupSansSpace" > /dev/null ; then
     _echo_info "Checking for install of Yum Group '$devGroup': Installed"
   else
     _echo_error "Yum Group '$devGroup' is not installed"
@@ -352,7 +352,7 @@ doCheckRedHat-7 () {
   local devGroupSansSpace=$(echo $devGroup | tr -d '[:space:]')
 
 
-  if yum grouplist "$devGroup" 2>/dev/null | tr -d '[:space:]' | grep "InstalledGroups:$devGroupSansSpace" > /dev/null ; then
+  if yum grouplist "$devGroup" 2>/dev/null | tr -d '[:space:]' | grep -i "InstalledGroups:$devGroupSansSpace" > /dev/null ; then
     _echo_info "Checking for install of Yum Group '$devGroup': Installed"
   else
     _echo_error "Yum Group '$devGroup' is not installed"
