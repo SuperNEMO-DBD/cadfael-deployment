@@ -441,7 +441,7 @@ doCheckUbuntu-14.04 () {
                  "libxpm-dev" \
                  "libxft-dev" \
                  "libxext-dev" \
-                 "libpng-dev" \
+                 "libpng12-dev" \
                  "libjpeg-dev")
 
   for pkg in "${debList[@]}"  ; do

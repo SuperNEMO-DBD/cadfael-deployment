@@ -117,7 +117,8 @@ therefore be downloaded and manually installed, or a suitable `yum`
 repo config can be added (TODO Docs).
 
 ## Ubuntu 14.04 LTS
-Required by homebrew:
+The list is longer here as there is no metapackage like `HEP_OSlibs`
+for Ubuntu.
 
 ```
 $ apt-get install -y \
@@ -131,20 +132,12 @@ libexpat-dev \
 libncurses-dev \
 ruby2.0 \
 texinfo \
-zlib1g-dev
-```
-
-Additional packages to fully support CadfaelBrew:
-
-- For Root5 visualization
-
-```
-$ apt-get install -y
+zlib1g-dev \
 libx11-dev \
 libxpm-dev \
 libxft-dev \
 libxext-dev \
-libpng-dev \
+libpng12-dev \
 libjpeg-dev
 ```
 
