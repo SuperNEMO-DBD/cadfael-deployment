@@ -57,7 +57,7 @@ readonly _kRHELIDREGEX='(RedHatEnterprise[[:alpha:]]*|CentOS|Scientific[[:alpha:
 
 declare -a kSUPPORTEDSYSTEMS
 readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(9|10)" \
-                            "${_kRHELIDREGEX}-[5-6]\.[0-9][0-9]?" \
+                            "${_kRHELIDREGEX}-[5-7]\.[0-9][0-9]?" \
                             "SUSELINUX-11" \
                             "Ubuntu-14\.04")
 
@@ -289,6 +289,57 @@ doCheckRedHat-6 () {
                  "openssl-devel" \
                  "ruby-irb.x86_64" \
                  "HEP_OSlibs_SL6")
+
+  for pkg in "${rpmList[@]}"  ; do
+    if ! checkRPM $pkg ; then
+      local missingPkgs="$pkg ${missingPkgs}"
+    fi
+  done
+
+  # Yum groups
+  local devGroup="Development tools"
+  local devGroupSansSpace=$(echo $devGroup | tr -d '[:space:]')
+
+
+  if yum grouplist "$devGroup" 2>/dev/null | tr -d '[:space:]' | grep "InstalledGroups:$devGroupSansSpace" > /dev/null ; then
+    _echo_info "Checking for install of Yum Group '$devGroup': Installed"
+  else
+    _echo_error "Yum Group '$devGroup' is not installed"
+    local missingGroups="'$devGroup'"
+  fi
+
+  local returnVal=0
+
+  if [ -n "$missingPkgs" ] ; then
+    _echo_error "RPMs '$missingPkgs' are not installed on this system"
+    _echo_error "Please run (or get your sysadmin to run):
+
+  $kPACKAGEMANAGER install $missingPkgs
+
+  "
+    returnVal=1
+  fi
+
+  if [ -n "$missingGroups" ] ; then
+    _echo_error "Yum Groups '$missingGroups' are not installed on this system"
+    _echo_error "Please run (or get your sysadmin to run):
+
+  yum groupinstall $missingGroups
+
+  "
+    returnVal=1
+  fi
+
+  return $returnVal
+}
+
+# - RHEL 7.X
+doCheckRedHat-7 () {
+  _echo_info "Checking system software for RedHat7 ($kOSDISTRO)"
+
+  local rpmList=("expat-devel" \
+                 "ruby-irb" \
+                 "HEP_OSlibs")
 
   for pkg in "${rpmList[@]}"  ; do
     if ! checkRPM $pkg ; then

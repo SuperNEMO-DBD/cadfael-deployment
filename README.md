@@ -99,14 +99,22 @@ $ yum groupinstall -y 'Development tools'
 and for 7 series:
 
 ```
-$ TOBECHECKED
+$ yum install -y \
+git \
+HEP_OSlibs \
+openssl-devel \
+ruby-irb \
+redhat-lsb-core
+
+$ yum groupinstall -y 'Development tools'
 ```
 
 Note that these are not the *complete* list
 of packages required, simply the additional set needed to be installed on top
 of a base install. Yum will pull in all needed dependencies.
-Note that `HEP_OSlibs*` rpms are provided by repos at CERN, so this needs to
-be added in your `yum` configuration (TODO Docs).
+Note that `HEP_OSlibs*` rpms are provided by repos at CERN. These must 
+therefore be downloaded and manually installed, or a suitable `yum`
+repo config can be added (TODO Docs).
 
 ## Ubuntu 14.04 LTS
 Required by homebrew:
