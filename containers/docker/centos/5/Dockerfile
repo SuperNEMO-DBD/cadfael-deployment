@@ -50,5 +50,6 @@ CMD git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git && \
   ./cadfael-installer && \
   cd Cadfael.git/bin && \
   brew install cadfael && \
-  brew ls --versions
+  brew ls --versions && \
+  brew info
 

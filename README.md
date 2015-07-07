@@ -13,7 +13,7 @@ Also provided are the 'from scratch' steps underlying the installer script.
 These are most useful if you're running on an unsupported system and
 want to try testing CadfaelBrew to this.
 
-# Systems Supported by CadfaelBrew
+# Systems Requirments for CadfaelBrew
 ## Supported
 As with upstream linuxbrew, only 64bit systems are supported.
 
@@ -22,6 +22,10 @@ As with upstream linuxbrew, only 64bit systems are supported.
   - [RHEL](http://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)/[CentOS](https://www.centos.org) 6.X, 7.X
   - [Scientific Linux](https://www.scientificlinux.org) 6.X
   - [Ubuntu](http://www.ubuntu.com) 14.04LTS
+
+All require of order 2GB disk space for the final install. A similar
+amount is needed for downloads of source/binary packages plus
+temporary space when building packages from source.
 
 ## Deprecated
 Supported on a 'best effort' basis, largely to allow us on older cluster

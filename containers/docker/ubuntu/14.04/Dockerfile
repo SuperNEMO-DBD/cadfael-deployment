@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
   libxpm-dev \
   libxft-dev \
   libxext-dev \
-  libpng-dev \
+  libpng12-dev \
   libjpeg-dev
 
 # Create user
@@ -41,4 +41,5 @@ CMD git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git && \
   cd cadfael-installer && \
   ./cadfael-installer && \
   brew install cadfael && \
-  brew ls --versions
+  brew ls --versions && \
+  brew info
