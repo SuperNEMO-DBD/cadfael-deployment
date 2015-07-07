@@ -9,6 +9,7 @@ RUN yum update -y && \
     HEP_OSlibs_SL6 \
     expat-devel \
     git \
+    openssl-devel \
     ruby-irb \
     redhat-lsb-core && \
   yum groupinstall -y "Development Tools"

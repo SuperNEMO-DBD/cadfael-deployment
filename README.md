@@ -62,7 +62,8 @@ not been merged into CadfaelBrew yet. The installer script will bootstrap
 a temporary local Ruby install if the system package manager cannot supply
 a sufficient version. It will then use `brew` itself to install the
 Homebrew Ruby for permanent use. So far no issues have been encountered
-with Git versions, though this can also be bootstrapped in future if required.
+with Git versions, though this can also be bootstrapped in future if required. Package lists below include any packages needed to bootstrap
+Ruby/Git.
 
 ## Mac OS X (Mavericks and higher)
 Only what homebrew itself requires - OS X plus Xcode. The latter 
@@ -88,6 +89,7 @@ $ yum install -y \
 expat-devel \
 git \
 HEP_OSlibs_SL6 \
+openssl-devel \
 ruby-irb \
 redhat-lsb-core
 

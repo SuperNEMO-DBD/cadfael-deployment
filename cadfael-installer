@@ -286,6 +286,7 @@ doCheckRedHat-6 () {
 
   local rpmList=("expat-devel" \
                  "git.x86_64" \
+                 "openssl-devel" \
                  "ruby-irb.x86_64" \
                  "HEP_OSlibs_SL6")
 
