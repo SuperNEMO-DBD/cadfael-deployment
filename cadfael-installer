@@ -436,7 +436,13 @@ doCheckUbuntu-14.04 () {
                  "libncurses-dev" \
                  "ruby2.0" \
                  "texinfo" \
-                 "zlib1g-dev")
+                 "zlib1g-dev" \
+                 "libx11-dev" \
+                 "libxpm-dev" \
+                 "libxft-dev" \
+                 "libxext-dev" \
+                 "libpng-dev" \
+                 "libjpeg-dev")
 
   for pkg in "${debList[@]}"  ; do
     if ! checkDeb $pkg ; then
