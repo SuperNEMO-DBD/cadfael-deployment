@@ -206,9 +206,9 @@ doReportSystemInfo() {
       for f in $(ls /etc/*-release) ; do
         fileContent="$(cat $f)"
         if [ -z "$linuxReleaseFiles" ] ; then
-          linuxReleaseFiles='{"file": "$f", "content": "$fileContent"}'
+          linuxReleaseFiles="{\"file\": \"$f\", \"content\": \"$fileContent\"}"
         else
-          linuxReleaseFiles='$linuxReleaseFiles, {"file": "$f", "content": "$fileContent"}'
+          linuxReleaseFiles="$linuxReleaseFiles, {\"file\": \"$f\", \"content\": \"$fileContent\"}"
         fi
       done
       
