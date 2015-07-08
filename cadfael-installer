@@ -62,63 +62,65 @@ readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(9|10)" \
                             "Ubuntu-14\.04")
 
 # - Operating System ID, Version and Packaging System
-readonly kOS=$(uname -s)
+doInit() {
+  readonly kOS=$(uname -s)
 
-case "$kOS" in
-  "Darwin")
-    readonly kOSDISTRO=$(sw_vers -productName | sed 's/ //g')
-    readonly kOSVERSION=$(sw_vers -productVersion | cut -d. -f1,2)
-    readonly kPACKAGETOOL="pkg"
-    ;;
-  "Linux")
-    # - Determine distro
-    kLSB_RELEASE=$(command -v lsb_release)
-    if [ -n "${kLSB_RELEASE}" ] ; then
-      readonly kOSDISTRO=$($kLSB_RELEASE -si | sed 's/ //g')
-      readonly kOSVERSION=$($kLSB_RELEASE -sr)
-    else
-      # Long term, probably want to check existence of the
-      # /etc/<NAME>-release files because lsb_release may not always
-      # be installed on a base system
-      _echo_exit "error: No 'lsb_release' command found"
-    fi
+  case "$kOS" in
+    "Darwin")
+      readonly kOSDISTRO=$(sw_vers -productName | sed 's/ //g')
+      readonly kOSVERSION=$(sw_vers -productVersion | cut -d. -f1,2)
+      readonly kPACKAGETOOL="pkg"
+      ;;
+    "Linux")
+      # - Determine distro
+      kLSB_RELEASE=$(command -v lsb_release)
+      if [ -n "${kLSB_RELEASE}" ] ; then
+        readonly kOSDISTRO=$($kLSB_RELEASE -si | sed 's/ //g')
+        readonly kOSVERSION=$($kLSB_RELEASE -sr)
+      else
+        # Long term, probably want to check existence of the
+        # /etc/<NAME>-release files because lsb_release may not always
+        # be installed on a base system
+        _echo_exit "error: No 'lsb_release' command found"
+      fi
 
-    # - Determine package/manager system
-    case "$kOSDISTRO" in 
-      Debian|Ubuntu)
-        readonly kPACKAGETOOL="dpkg"
-        readonly kPACKAGEMANAGER="apt-get"
-        ;;
-      RedHat.*|CentOS|Scientific.*)
-        readonly kPACKAGETOOL="rpm"
-        readonly kPACKAGEMANAGER="yum"
-        ;;
-      SUSELINUX)
-        readonly kPACKAGETOOL="rpm"
-        readonly kPACKAGEMANAGER="zypper"
-        ;;
-      *)
-        # Can only mark as empty and warn later on that no packages can
-        # be checked
-        readonly kPACKAGETOOL="<unknown:packagetool>"
-        readonly kPACKAGEMANAGER="<unknown:packagemanager>"
-        ;;
-    esac
-    ;;
-  *)
-    # A hard fail here because we really can't progress any further
-    _echo_error "Unsupported OS '$kOS'"
-    _echo_exit  "Only Linux and Darwin are currently supported"
-    ;;
-esac
+      # - Determine package/manager system
+      case "$kOSDISTRO" in 
+        Debian|Ubuntu)
+          readonly kPACKAGETOOL="dpkg"
+          readonly kPACKAGEMANAGER="apt-get"
+          ;;
+        RedHat.*|CentOS|Scientific.*)
+          readonly kPACKAGETOOL="rpm"
+          readonly kPACKAGEMANAGER="yum"
+          ;;
+        SUSELINUX)
+          readonly kPACKAGETOOL="rpm"
+          readonly kPACKAGEMANAGER="zypper"
+          ;;
+        *)
+          # Can only mark as empty and warn later on that no packages can
+          # be checked
+          readonly kPACKAGETOOL="<unknown:packagetool>"
+          readonly kPACKAGEMANAGER="<unknown:packagemanager>"
+          ;;
+      esac
+      ;;
+    *)
+      # A hard fail here because we really can't progress any further
+      _echo_error "Unsupported OS '$kOS'"
+      _echo_exit  "Only Linux and Darwin are currently supported"
+      ;;
+  esac
 
-# - Architecture
-readonly kARCH=$(uname -m)
-if [ "${kARCH}" != "x86_64" ] ; then
-  # Hard fail because it's not worth going any further
-  _echo_error "Unsupported architecture '$kARCH'"
-  _echo_exit  "Only 'x86_64' architectures are currently supported"
-fi
+  # - Architecture
+  readonly kARCH=$(uname -m)
+  if [ "${kARCH}" != "x86_64" ] ; then
+    # Hard fail because it's not worth going any further
+    _echo_error "Unsupported architecture '$kARCH'"
+    _echo_exit  "Only 'x86_64' architectures are currently supported"
+  fi
+}
 
 #-----------------------------------------------------------------------
 # MAIN API
@@ -169,6 +171,57 @@ getAbsolutePath() {
       _echo_exit "getAbsolutePath called on unsupported '$kOS'"
       ;;
   esac
+}
+
+#-----------------------------------------------------------------------
+# - Report info on OS, distro, version
+#   Can be run on any system, but mainly intended to supply info
+#   on new systems to help in starting support
+#   Sort of redundant given checks done on startup, but can help
+#   to give some info upstream.
+doReportSystemInfo() {
+  # uname info
+  unameArch=$(uname -m)
+  unameOSName=$(uname -s)
+  unameOSRelease=$(uname -r)
+  unameOSVersion=$(uname -v)
+
+  printf -v jsonUnameInfo '"uname": {"arch": "%s", "name":"%s". "release":"%s", "version": "%s"}' \
+    "$unameArch" \
+    "$unameOSName" \
+    "$unameOSRelease" \
+    "$unameOSVersion"
+
+
+  # OS info
+  case "$unameOSName" in
+    "Darwin")
+      printf -v jsonOsInfo '"Darwin": { "productName": "%s", "productVersion": "%s", "buildVersion": "%s"}' \
+        "$(sw_vers -productName)" \
+        "$(sw_vers -productVersion)" \
+        "$(sw_vers -buildVersion)"
+      ;;
+    "Linux")
+      linuxReleaseFiles=""
+      for f in $(ls /etc/*-release) ; do
+        fileContent="$(cat $f)"
+        if [ -z "$linuxReleaseFiles" ] ; then
+          linuxReleaseFiles='{"file": "$f", "content": "$fileContent"}'
+        else
+          linuxReleaseFiles='$linuxReleaseFiles, {"file": "$f", "content": "$fileContent"}'
+        fi
+      done
+      
+      printf -v jsonOsInfo '"Linux": { "releaseFiles": [%s]}' \
+        "$linuxReleaseFiles"
+      ;;
+    *)
+      osInfo="tobedetermined"
+      ;;
+  esac
+
+  # JSON-ize
+  printf '{%s, %s}\n' "$jsonUnameInfo" "$jsonOsInfo"
 }
 
 #-----------------------------------------------------------------------
@@ -542,6 +595,7 @@ getSystemCheckFunction () {
 #   that their installer also checks for Xcode
 #   On Linux, defer to more involved checking system
 doCheckSystemSoftware () {
+  _echo_info "in doCheckSystemSoftware $kOSDISTRO-$kOSVERSION"
   if isSystemSupported "$kOSDISTRO-$kOSVERSION" ; then
     _echo_info "System supported"
     $(getSystemCheckFunction "$kOSDISTRO-$kOSVERSION")
@@ -667,6 +721,8 @@ Requires a working network connection.
 
 Arguments:
   -h                    Print this help message and exit
+  -s                    Print information on system, whether supported
+                        or not and exit
   -p [DIR]              Install Cadfael.git bundle under DIR
                         If DIR is not provided, it defaults to the
                         current working directory
@@ -686,18 +742,22 @@ EOF
 main() {
   local installPrefix=$(pwd)
 
-  while getopts ":hp:" opt ; do
+  while getopts ":hsp:" opt ; do
     case $opt in
       p)
         local installPrefix="$OPTARG"
         ;;
+      s)
+        doReportSystemInfo
+        return 0
+        ;;
       h)
         displayHelp
-        exit 0
+        return 0
         ;;
       \?)
         displayUsage
-        _echo_error "Invalid option '-$OPTARG'"
+        _echo_exit "Invalid option '-$OPTARG'"
         ;;
       :)
         displayUsage
@@ -709,6 +769,7 @@ main() {
     esac
   done
 
+  doInit
   _echo_info "Detected '$kOS' Operating System"
   _echo_info "Distribution '$kOSDISTRO ($kOSVERSION)'"
 
