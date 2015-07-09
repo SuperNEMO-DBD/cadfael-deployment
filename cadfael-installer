@@ -702,6 +702,15 @@ doBrewSetup() {
   return 0
 }
 
+
+#-----------------------------------------------------------------------
+# Check basic network connectivity by pinging github...
+doCheckNetwork() {
+  ping -c 3 github.com
+  return $?
+}
+
+
 #-----------------------------------------------------------------------
 # Usage and Help
 #
@@ -774,6 +783,7 @@ main() {
   _echo_info "Distribution '$kOSDISTRO ($kOSVERSION)'"
 
   doCheckSystemSoftware || _echo_exit "System software check failed"
+  doCheckNetwork || _echo_exit "Cannot connect to github.com, check your netowrk connection"
   doGithubClone "$installPrefix" || _echo_exit "Clone of Cadfael repo failed"
   doBrewSetup "$installPrefix" || _echo_exit "Cadfael setup failed"
 
