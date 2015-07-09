@@ -74,8 +74,10 @@ Homebrew Ruby for permanent use. So far no issues have been encountered
 with Git versions, though this can also be bootstrapped in future if required. Package lists below include any packages needed to bootstrap
 Ruby/Git.
 
-## Mac OS X (Mavericks and higher)
-Only what homebrew itself requires - OS X plus Xcode. The latter 
+## Mac OS X
+Support for OS X follows Homebrew itself, and this generally means the last three production versions.
+At the time of writing this means OS X 10.8 (Mountain Lion), 10.9 (Mavericks) and 10.10 (Yosemite). 
+System requirements are only what homebrew itself requires - OS X plus Xcode. The latter 
 may be installed through the [App Store](https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12),
 though `cadfael-installer` will offer to install it for you if it is not present
 when you run the installer script.
