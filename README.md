@@ -219,7 +219,7 @@ Any missing packages will be reported together with instructions on installing t
 
 Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
 It then runs the `brew` command to install the `cadfael` Formula that installs the required software packages. A
-complete list of packages can be found in [the documentation ofor the `homebrew-cadfael` tap](https://github.com/SuperNEMO-DBD/homebrew-cadfael]
+complete list of packages can be found in [the documentation for the `homebrew-cadfael` tap](https://github.com/SuperNEMO-DBD/homebrew-cadfael)
 Once complete, instructions should be printed on using the installed software.
 
 
