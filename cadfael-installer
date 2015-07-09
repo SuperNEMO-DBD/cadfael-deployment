@@ -699,17 +699,96 @@ doBrewSetup() {
     _echo_info "Brewing of Ruby complete"
   fi
 
+  # Report brew config/env
+  _echo_info "CadfaelBrew set up with config:"
+  PATH="$1/Cadfael.git/bin:$rubyBootstrap/bin:$PATH" brew config || _echo_exit "internal brew error"
+
+  _echo_info "CadfaelBrew default build environment:"
+  PATH="$1/Cadfael.git/bin:$rubyBootstrap/bin:$PATH" brew --env || _echo_exit "internal brew error"
+
+  _echo_info "CadfaelBrew install and setup complete under '$installPrefix'"
   return 0
 }
 
 
 #-----------------------------------------------------------------------
+# Actually brew cadfael, if required
+#
+doBrewCadfael() {
+  _echo_info "Starting brew of Cadfael..."
+  if [ -z "$1" ] ; then _echo_exit "No install directory" ; fi
+  if [ ! -x "$1/Cadfael.git/bin/brew" ] ; then
+    _echo_exit "No executable 'brew' command under '$1/Cadfael.git'"
+  fi
+
+  if ! PATH="$1/Cadfael.git/bin:$PATH" brew install cadfael ; then
+    _echo_warning "Failed to brew Cadfael formula
+  
+  This is likely due to a failure to build one of its dependencies:
+
+  $(PATH="$1/Cadfael.git/bin:$PATH" brew deps -n1 cadfael)
+
+  To proceed, change into the directory
+
+  $1/Cadfael.git/bin
+
+  and manually run
+
+  ./brew install -v cadfael
+
+  This will pick up installation at the last, and failing formula. The
+  '-v' option will produce more output to help track down the error.
+  This, plus listed log files can be reported as an issue to the
+  appropriate issue tracker, either mailing list or to GitHub
+  if you have an account there
+  "
+    return 1
+  fi
+
+  _echo_info "Cadfael Formulae brewed o.k."
+  return 0
+}
+
+#-----------------------------------------------------------------------
 # Check basic network connectivity by pinging github...
 doCheckNetwork() {
-  ping -c 3 github.com
+  _echo_info "Checking basic network connectivity"
+  ping -c 3 github.com > /dev/null
   return $?
 }
 
+#-----------------------------------------------------------------------
+# Output some help on setup
+#
+doHelpSetup() {
+  cat <<EOF
+Install of CadfaelBrew complete under
+
+$1
+
+To use the programs and libraries supplied by Cadfael you can:
+
+1. (Recommended) Use brew's setup facility to start a new shell session
+   with the environment correctly configured:
+
+   $ $1/Cadfael.git/bin/brew sh
+
+   This starts a new shell with PATH and other environment variables
+   set correctly. Just exit the shell to return to your original session.
+
+2. Set the following environment variables either directly in your
+   shell's .rc file or through the configuration mechanism of your choice
+   (e.g. Environment Modules)
+
+   PATH="$1/Cadfael.git/bin:\$PATH"
+   MANPATH="$1/Cadfael.git/share/man:\$MANPATH"
+   INFOPATH="$1/Cadfael.git/share/info:\$INFOPATH"
+
+In both cases that should be all that's needed, though certain use cases
+may also required the dynamic loader or Python path to be set. This is
+to be reviewed.
+EOF
+}
 
 #-----------------------------------------------------------------------
 # Usage and Help
@@ -735,6 +814,8 @@ Arguments:
   -p [DIR]              Install Cadfael.git bundle under DIR
                         If DIR is not provided, it defaults to the
                         current working directory
+  -b                    Do not install Cadfael Formula after bootstrapping
+                        CadfaelBrew
 
 Exit status:
   0  if OK
@@ -751,8 +832,11 @@ EOF
 main() {
   local installPrefix=$(pwd)
 
-  while getopts ":hsp:" opt ; do
+  while getopts ":hsbp:" opt ; do
     case $opt in
+      b)
+        local bareInstall="bareInstall"
+        ;;
       p)
         local installPrefix="$OPTARG"
         ;;
@@ -784,10 +868,22 @@ main() {
 
   doCheckSystemSoftware || _echo_exit "System software check failed"
   doCheckNetwork || _echo_exit "Cannot connect to github.com, check your netowrk connection"
-  doGithubClone "$installPrefix" || _echo_exit "Clone of Cadfael repo failed"
-  doBrewSetup "$installPrefix" || _echo_exit "Cadfael setup failed"
+  doGithubClone "$installPrefix" || _echo_exit "Clone of CadfaelBrew repo failed"
+  doBrewSetup "$installPrefix" || _echo_exit "CadfaelBrew setup failed"
+  if [ -z "$bareInstall" ] ; then
+    doBrewCadfael "$installPrefix" || _echo_exit "Brewing of Cadfael formula failed"
+  fi
 
-  _echo_info "Cadfael install complete under '$installPrefix'"
+  doHelpSetup "$installPrefix"
+
+  if [ -n "$bareInstall" ] ; then
+    echo "
+Note that you have not as yet installed the Cadfael formula, so you 
+should now do:
+
+  \$ $installPrefix/Cadfael.git/bin/brew install cadfael
+  "
+  fi
 
   return 0
 }
