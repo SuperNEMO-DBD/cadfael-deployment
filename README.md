@@ -208,15 +208,62 @@ or to install to, say, a directory `$HOME/supernemo`, do
 $ ./cadfael-installer -p $HOME/supernemo
 ```
 
-In both cases, a subdirectory `Cadfael.git` will be created under the prefix to hold the installation.
+In both cases, a subdirectory `Cadfael.git` will be created under the prefix to hold the installation. For all options available, run
+
+```
+$ ./cadfael-installer -h
+```
 
 The script will check that your system is supported and provides the needed system packages used by Cadfael. 
 Any missing packages will be reported together with instructions on installing them (this may need to be done by your sysadmin if you don't have sufficient privileges on the system).For certain older systems that do not provide a sufficiently recent version of the Ruby language that CadfaelBrew is written in, this will be bootstrapped.
-Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
 
+Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
+It then runs the `brew` command to install the `cadfael` Formula that installs the required software packages. A
+complete list of packages can be found in [the documentation ofor the `homebrew-cadfael` tap](https://github.com/SuperNEMO-DBD/homebrew-cadfael]
+Once complete, instructions should be printed on using the installed software.
 
 
 # Installing CadfaelBrew by Hand
+Should your system not be supported by the installer, or you cannot run the installer for other reasons, CadfaelBrew
+can be installed by hand. The installer script simply wraps these steps in a convenient manner together with package checks. To get CadfaelBrew itself installed, follow the instructions at ....
+
+The dedicated Homebrew tap for SuperNEMO should then be added:
+
+```
+$ brew tap SuperNEMO-DBD/cadfael
+```
+
+Finally, install cadfael:
+
+```
+$ brew install cadfael
+```
+
+Should any errors occur, you can run again with
+
+```
+$ brew install -v cadfael
+```
+
+which should print out more information, or if you're happy for more manual intervention, do
+
+```
+$ brew install -vd cadfael
+```
+
+This will offer to drop you into the build of the failing package from which you can run its configure/build
+system to try and diagnose the issue in more depth. If you are running on an unsupported system, the most likely
+cause of errors is missing system packages.
+
+## Adding Support for New Systems
+If your system is not supported by the installer script, please submit a feature request on the issue tracker. 
+To help in triaging whether support can be added, you should still clone this repo and then run
+
+```
+$ ./cadfael-installer -s
+```
+
+Paste the resulting output into your feature request. Support cannot be guaranteed for all systems.
 
 
 # Containers
