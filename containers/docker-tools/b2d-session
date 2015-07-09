@@ -15,7 +15,7 @@ function error_exit {
 b2d=$(command -v boot2docker) || error_exit "No boot2docker command found"
 
 # Are we running already?
-b2d_status=$($b2d status)
+b2d_status=$($b2d status 2>/dev/null || echo "poweroff")
 
 # Cycle VM, use at least 5GB of memory
 if [ "$b2d_status" == "poweroff" ] ; then

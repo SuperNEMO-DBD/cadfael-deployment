@@ -83,10 +83,11 @@ As homebrew supports OS X, support on other UNIX platforms is based
 on trying to match the base system software supplied by Apple.
 
 ## RHEL/CentOS/SL 6/7
-We base the use the [`HEP_OSlibs`](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) 
-metapackage here as this is should always be installed on Grid nodes. 
-Plus it makes it easy for deployment on other systems. However, it is not
-totally complete, so the basic list of rpms on the 6 series is:
+On this family, the [`HEP_OSlibs`](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) 
+metapackage is used to provide most of the functionality on top of the base system as this is should always be installed on any system running LHC software. To get and install this rpm, follow the instructions as
+provided for the [6 Series](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) or [7 Series](https://twiki.cern.ch/twiki/bin/view/LCG/CentOS7DependencyRPM) as appropriate. A few extra packages are needed
+to support Cadfael's bootstrapping proceedure, so the basic list of 
+rpms for the 6 series is:
 
 ```
 $ yum install -y \
@@ -116,9 +117,6 @@ $ yum groupinstall -y 'Development tools'
 Note that these are not the *complete* list
 of packages required, simply the additional set needed to be installed on top
 of a base install. Yum will pull in all needed dependencies.
-Note that `HEP_OSlibs*` rpms are provided by repos at CERN. These must 
-therefore be downloaded and manually installed, or a suitable `yum`
-repo config can be added (TODO Docs).
 
 ## Ubuntu 14.04 LTS
 The list is longer here as there is no metapackage like `HEP_OSlibs`
@@ -146,8 +144,11 @@ libjpeg-dev
 ```
 
 ## RedHat/CentOS/SL 5
-So far identified (main gotcha is that `HEP_OSlibs_SL5` does *not* provide
-X11, GL, ncurses devel packages).
+The 5 series of RHEL is considered deprecated due to LHC production sites
+moving to the 6 and 7 series. However, 5 series support is maintained on
+"best effort" basis to provide a transitional on older cluster systems.
+As with the 6/7 series, the [`HEP_OSlibs` metapackage](https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM) is used to provide a basic 
+package set, and this should be installed following the [instructions provided on the LCG wiki)[https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM). This RPM is not as fully featured as those for the 6/7 series, so a larger number of additional packages are required:
 
 ```
 $ yum install -y \

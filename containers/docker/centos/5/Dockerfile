@@ -27,7 +27,8 @@ RUN yum update -y && \
     libXext-devel \
     libXfixes-devel \
     libXft-devel \
-    libXpm-devel && \
+    libXpm-devel \
+    yum-utils && \
   yum groupinstall -y "Development Tools"
 
 # Create user
