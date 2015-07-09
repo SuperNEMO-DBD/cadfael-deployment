@@ -187,9 +187,18 @@ $ yum groupinstall -y "Development Tools"
 
 
 # Installing CadfaelBrew using `cadfael-installer`
-You will require a working network connection in order to clone the CadfaelBrew repository and subsequently install any packages. Simply run the `cadfael-installer` script from the command line, optionally passing an installation prefix. For example, to install CadfaelBrew under the current working directory, simply do:
+Ensure your system is supported and that the requisite software is installed. You will also require a working network connection in order to clone the CadfaelBrew repository and subsequently install any packages. 
+
+Begin by cloning this repository to a location of your choice:
 
 ```
+$ git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git cadfael-installer.git
+```
+
+Change into the root directory of the cloned repository and run the `cadfael-installer` script from the command line, optionally passing an installation prefix. For example, to install CadfaelBrew under the current working directory, simply do:
+
+```
+$ cd cadfael-installer.git
 $ ./cadfael-installer
 ```
 
@@ -199,11 +208,13 @@ or to install to, say, a directory `$HOME/supernemo`, do
 $ ./cadfael-installer -p $HOME/supernemo
 ```
 
-In both cases, a subdirectory `Cadfael.git` will be created to hold the installation.
+In both cases, a subdirectory `Cadfael.git` will be created under the prefix to hold the installation.
 
 The script will check that your system is supported and provides the needed system packages used by Cadfael. 
-Any missing packages will be reported together with instructions on installing them (this may need to be done by your sysadmin if you don't have sufficient priveleges on the system). For certain older systems that do not provide a sufficiently recent version of the Ruby language that CadfaelBrew is written in, this will be bootstrapped.
+Any missing packages will be reported together with instructions on installing them (this may need to be done by your sysadmin if you don't have sufficient privileges on the system).For certain older systems that do not provide a sufficiently recent version of the Ruby language that CadfaelBrew is written in, this will be bootstrapped.
 Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
+
+
 
 # Installing CadfaelBrew by Hand
 
