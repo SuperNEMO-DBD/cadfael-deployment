@@ -13,7 +13,7 @@ Also provided are the 'from scratch' steps underlying the installer script.
 These are most useful if you're running on an unsupported system and
 want to try testing CadfaelBrew to this.
 
-# Systems Requirments for CadfaelBrew
+# Systems Requirements for CadfaelBrew
 ## Supported
 As with upstream linuxbrew, only 64bit systems are supported.
 
@@ -143,12 +143,12 @@ libpng12-dev \
 libjpeg-dev
 ```
 
-## RedHat/CentOS/SL 5
+## RHEL/CentOS/SL 5
 The 5 series of RHEL is considered deprecated due to LHC production sites
 moving to the 6 and 7 series. However, 5 series support is maintained on
 "best effort" basis to provide a transitional on older cluster systems.
 As with the 6/7 series, the [`HEP_OSlibs` metapackage](https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM) is used to provide a basic 
-package set, and this should be installed following the [instructions provided on the LCG wiki)[https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM). This RPM is not as fully featured as those for the 6/7 series, so a larger number of additional packages are required:
+package set, and this should be installed following the [instructions provided on the LCG wiki)(https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM). This RPM is not as fully featured as those for the 6/7 series, so a larger number of additional packages are required:
 
 ```
 $ yum install -y \
