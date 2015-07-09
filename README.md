@@ -27,6 +27,11 @@ All require of order 2GB disk space for the final install. A similar
 amount is needed for downloads of source/binary packages plus
 temporary space when building packages from source.
 
+If your system is not listed above, this does not neccessarily mean that CadfaelBrew
+will not work on it. Please review the sections on [deprecated](#deprecated)
+and [work in progress](#work-in-progress) to see if your system is listed. If it
+is not listed and you'd like support for it, please see the section on [manually installing CadfaelBrew](#installing-cadfaelbrew-by-hand) for further instructions.
+
 ## Deprecated
 Supported on a 'best effort' basis, largely to allow us on older cluster
 systems.
