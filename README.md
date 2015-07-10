@@ -220,9 +220,52 @@ Any missing packages will be reported together with instructions on installing t
 
 Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
 It then runs the `brew` command to install the `cadfael` Formula that installs the required software packages. A
-complete list of packages can be found in [the documentation for the `homebrew-cadfael` tap](https://github.com/SuperNEMO-DBD/homebrew-cadfael)
-Once complete, instructions should be printed on using the installed software.
+complete list of packages can be found in [the documentation for the `homebrew-cadfael` tap](https://github.com/SuperNEMO-DBD/homebrew-cadfael). Once complete, the `Cadfael.git` subdirectory created by the installer will be populated with a UNIX style flat directory hierarchy:
 
+```
++- Cadfael.git/
+   +- bin/
+   |  +- brew
+   |  +- root
+   |  +- ... other programs ...
+   +- lib/
+   |  +- libgsl.<ext>
+   |  +- ... other libraries ...
+   +- include/
+   |  +- gsl.h
+   |  +- ... other headers ...
+   +- share/
+   |  +- ... man pages etc ...
+   +- Library/
+   |  +- ... Homebrew internals ...
+   +- Cellar/
+      +- ... physical, versioned installs of packages ...
+```
+
+Once complete, instructions should be printed on setting up your system to use the installed software. The simplest way to start using brewed software is to run
+
+```
+$ ./PATHTO/Cadfael.git/bin/brew sh
+```
+
+This will drop you into a new shell session under the brewed environment. You should then be able to run programs and develop against the brewed software directly, and then exit back to a pristine shell e.g.
+
+```
+$ ./PATHTO/Cadfael.git/bin/brew sh
+... new shell starts ...
+$ root
+... brewed root starts, do some work ...
+
+$ cd mycppproject
+$ cmake .
+... will used brewed cmake, packages found under brewed root first ...
+$ make && make test
+...
+$ exit
+... back to original shell ...
+```
+
+Information on package statuses etc can be queried through the `brew` command. See the full [CadfaelBrew documentation](https://github.com/SuperNEMO-DBD/cadfaelbrew/tree/master/share/doc/homebrew) for more information here. 
 
 # Installing CadfaelBrew by Hand
 Should your system not be supported by the installer, or you cannot run the installer for other reasons, CadfaelBrew
