@@ -1,6 +1,6 @@
 # cadfael-installer
 Bootstrap installer for [CadfaelBrew](https://github.com/SuperNEMO-DBD/cadfaelbrew.git),
-the SuperNEMO experiment's fork of the [Linuxbrew](http://brew.sh/linuxbrew)/[Homebrew](https://brew.sh) 
+the SuperNEMO experiment's fork of the [Linuxbrew](http://brew.sh/linuxbrew)/[Homebrew](https://brew.sh)
 software package manager. This bootstrap script is provided
 to help users get a base install of CadfaelBrew up and running on
 Linux and OS X platforms. It handles checks for required system
@@ -17,7 +17,7 @@ want to try testing CadfaelBrew to this.
 ## Supported
 As with upstream linuxbrew, only 64bit systems are supported.
 
-- [Mac OS X](https://www.apple.com/osx/) 10.9 (Mavericks), 10.10 (Yosemite)
+- [Mac OS X](https://www.apple.com/osx/) 10.8 (Mountain Lion), 10.9 (Mavericks), 10.10 (Yosemite)
 - Linux Distributions:
   - [RHEL](http://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)/[CentOS](https://www.centos.org) 6.X, 7.X
   - [Scientific Linux](https://www.scientificlinux.org) 6.X
@@ -33,7 +33,7 @@ and [work in progress](#work-in-progress) to see if your system is listed. If it
 is not listed and you'd like support for it, please see the section on [manually installing CadfaelBrew](#installing-cadfaelbrew-by-hand) for further instructions.
 
 ## Deprecated
-Supported on a 'best effort' basis, largely to allow us on older cluster
+Supported on a 'best effort' basis, largely to allow use on older cluster
 systems.
 
 - RHEL/CentOS/Scientific Linux 5.X
@@ -54,7 +54,7 @@ stage.
 Though CadfaelBrew provides a wide range of software packages, it
 is not completely standalone and needs a base set of software
 to be installed through the system package manager (yum/apt/App Store etc)
-Lists of prerequisite packages are given below and are derived from the minimal 
+Lists of prerequisite packages are given below and are derived from the minimal
 list required by homebrew itself, *plus* any required from our own
 packages.
 
@@ -63,12 +63,13 @@ Homebrew is written in the [Ruby language](https://www.ruby-lang.org/en/) and
 uses the [git](https://git-scm.com) version control system for distributing
 updates. The minimum requirements to run the `brew` command are thus:
 
-- Ruby 1.9 or higher
-- git 1.7 or higher
+- Ruby 1.9 or higher (Run `ruby --version` to check)
+- git 1.7 or higher (Run `git --version` to check)
 
-Homebrew are gradually removing support for Ruby versions less than 2.0, though these have
-not been merged into CadfaelBrew yet. The installer script will bootstrap
-a temporary local Ruby install if the system package manager cannot supply
+Homebrew are gradually removing support for Ruby versions less than 2.0,
+though these patches have not been merged into CadfaelBrew yet.
+The installer script will bootstrap a temporary local Ruby install if the
+system package manager cannot supply
 a sufficient version. It will then use `brew` itself to install the
 Homebrew Ruby for permanent use. So far no issues have been encountered
 with Git versions, though this can also be bootstrapped in future if required. Package lists below include any packages needed to bootstrap
@@ -76,13 +77,13 @@ Ruby/Git.
 
 ## Mac OS X
 Support for OS X follows Homebrew itself, and this generally means the last three production versions.
-At the time of writing this means OS X 10.8 (Mountain Lion), 10.9 (Mavericks) and 10.10 (Yosemite). 
-System requirements are only what homebrew itself requires - OS X plus Xcode. The latter 
+At the time of writing this means OS X 10.8 (Mountain Lion), 10.9 (Mavericks) and 10.10 (Yosemite).
+System requirements are only what homebrew itself requires - OS X plus Xcode. The latter
 may be installed through the [App Store](https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12),
 though `cadfael-installer` will offer to install it for you if it is not present
 when you run the installer script.
 
-At present, we don't require Xquartz(X11), for graphical displays, preferring 
+At present, we don't require Xquartz(X11), for graphical displays, preferring
 Cocoa and Qt as these are supported by ROOT and Geant4 respectively.
 
 ## Linux Distributions
@@ -90,10 +91,10 @@ As homebrew supports OS X, support on other UNIX platforms is based
 on trying to match the base system software supplied by Apple.
 
 ## RHEL/CentOS/SL 6/7
-On this family, the [`HEP_OSlibs`](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) 
+On this family, the [`HEP_OSlibs`](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM)
 metapackage is used to provide most of the functionality on top of the base system as this is should always be installed on any system running LHC software. To get and install this rpm, follow the instructions as
 provided for the [6 Series](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) or [7 Series](https://twiki.cern.ch/twiki/bin/view/LCG/CentOS7DependencyRPM) as appropriate. A few extra packages are needed
-to support Cadfael's bootstrapping proceedure, so the basic list of 
+to support Cadfael's bootstrapping proceedure, so the basic list of
 rpms for the 6 series is:
 
 ```
@@ -154,7 +155,7 @@ libjpeg-dev
 The 5 series of RHEL is considered deprecated due to LHC production sites
 moving to the 6 and 7 series. However, 5 series support is maintained on
 "best effort" basis to provide a transitional on older cluster systems.
-As with the 6/7 series, the [`HEP_OSlibs` metapackage](https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM) is used to provide a basic 
+As with the 6/7 series, the [`HEP_OSlibs` metapackage](https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM) is used to provide a basic
 package set, and this should be installed following the [instructions provided on the LCG wiki)(https://twiki.cern.ch/twiki/bin/view/LCG/SL5DependencyRPM). This RPM is not as fully featured as those for the 6/7 series, so a larger number of additional packages are required:
 
 ```
@@ -187,7 +188,7 @@ $ yum groupinstall -y "Development Tools"
 
 
 # Installing CadfaelBrew using `cadfael-installer`
-Ensure your system is supported and that the requisite software is installed. You will also require a working network connection in order to clone the CadfaelBrew repository and subsequently install any packages. 
+Ensure your system is supported and that the requisite software is installed. You will also require a working network connection in order to clone the CadfaelBrew repository and subsequently install any packages.
 
 Begin by cloning this repository to a location of your choice:
 
@@ -214,7 +215,7 @@ In both cases, a subdirectory `Cadfael.git` will be created under the prefix to 
 $ ./cadfael-installer -h
 ```
 
-The script will check that your system is supported and provides the needed system packages used by Cadfael. 
+The script will check that your system is supported and provides the needed system packages used by Cadfael.
 Any missing packages will be reported together with instructions on installing them (this may need to be done by your sysadmin if you don't have sufficient privileges on the system).For certain older systems that do not provide a sufficiently recent version of the Ruby language that CadfaelBrew is written in, this will be bootstrapped.
 
 Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
@@ -225,17 +226,17 @@ Once complete, instructions should be printed on using the installed software.
 
 # Installing CadfaelBrew by Hand
 Should your system not be supported by the installer, or you cannot run the installer for other reasons, CadfaelBrew
-can be installed by hand. The installer script simply wraps these steps in a convenient manner together with checks for required system packages. 
+can be installed by hand. The installer script simply wraps these steps in a convenient manner together with checks for required system packages.
 
 To get CadfaelBrew itself installed, first ensure you have the needed
 versions of Ruby and Git as [listed above](#system-requirements-for-cadfaelbrew).
 Should the system Ruby and Git versions not be sufficient, temporary
 local installs should be performed following the instructions on the
-[Ruby](http://www.ruby-lang.org) and [Git](https://git-scm.com) homepages. 
+[Ruby](http://www.ruby-lang.org) and [Git](https://git-scm.com) homepages.
 Ensure that Ruby is built with OpenSSL support. If you have installed
-temporary Ruby and Git versions, ensure that the directories holding their 
+temporary Ruby and Git versions, ensure that the directories holding their
 `ruby` and `git` executables are prepended to the UNIX PATH environment
-variable. 
+variable.
 
 With the requisite Ruby and Git in place, clone the core CadfaelBrew
 repository to a location of your choice:
@@ -303,16 +304,16 @@ which will print out more information. If you're happy for more manual intervent
 $ brew install -vd cadfael
 ```
 
-This will offer to drop you into the build of the failing package (choose option '5') from which you can run its configure/build system to try 
-and diagnose the issue in more depth. 
-If you are running on an unsupported system, the most likely cause 
+This will offer to drop you into the build of the failing package (choose option '5') from which you can run its configure/build system to try
+and diagnose the issue in more depth.
+If you are running on an unsupported system, the most likely cause
 of errors is missing system packages. Some investigation will be required
 through the system package manager to track these down. Though package
 names will not be the same across different systems, the [Ubuntu](ubuntu-14.04-lts) list can provide a good starting list for matching up to
 your system.
 
 ## Adding Support for New Systems
-If your system is not supported by the installer script, please submit a feature request on the issue tracker. 
+If your system is not supported by the installer script, please submit a feature request on the issue tracker.
 To help in triaging whether support can be added, you should still clone this repo and then run
 
 ```
