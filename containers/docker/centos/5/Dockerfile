@@ -37,7 +37,7 @@ RUN useradd -m cadfael
 # Now our own user and basic "at container entry" setup
 USER cadfael
 WORKDIR /home/cadfael
-ENV PATH /home/cadfael/cadfael-installer/Cadfael.git/bin:$PATH
+#ENV PATH /home/cadfael/cadfael-installer/Cadfael.git/bin:$PATH
 
 # ---------------------------------------------------------------------
 # What actually happens when we RUN the container under "docker run"
@@ -50,7 +50,6 @@ CMD git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git && \
   cd cadfael-installer && \
   ./cadfael-installer && \
   cd Cadfael.git/bin && \
-  brew install cadfael && \
-  brew ls --versions && \
-  brew info
+  ./brew ls --versions && \
+  ./brew info
 
