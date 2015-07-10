@@ -4,9 +4,46 @@
 # is needed.
 # - Determine system
 # - Check deps
+# - Bootstrap Ruby if needed
 # - Checkout correct repo
 # - brew doctor
-# - (optional) brew install
+# - brew install [ruby] cadfael
+#
+# - Currently supported systems:
+#   RHEL family 5/6/7
+#   SUSE Enterprise 11
+#   Ubuntu 14.04 LTS
+#   Mac OSX 10.9-10
+#
+# - How to add support for new Linux systems
+#   1) Get the output of `lsb_release -si | sed 's/ //g'`
+#      This is used to set the global variable 'kOSDISTRO'
+#      Get the output of `lsb_release -sr`
+#      This is used to set the global variable 'kOSVERSION`
+#   2) Add a regex to to the global array 'kSUPPORTEDSYSTEMS` that
+#      will match the string 'kOSDISTRO-kOSVERSION' as derived for
+#      your system above
+#   3) Add a function named 'doCheck-DIST-VERSION', replacing DIST and
+#      VERSION in this name with the values derived in step 1)
+#   4) In this function, implement checks for required system packages
+#      using the system package manager. If your system uses deb or
+#      rpm packages, you can use the checkRPM and checkDeb helper
+#      functions (See 'doCheckRedHat-6` and `doCheckUbuntu-14.04`
+#      for example usage). The function *must* return 0 if all
+#      checks are passed, or 1 otherwise. You should implement the checks
+#      such that all are performed and the names of any missing packages
+#      collated. This list should be reported using the '_echo_error`
+#      logging function, and inform the user on the steps needed to
+#      install them (e.g. "you need to run 'pkger install foo bar'")
+#   5) Brew requires that the GNU compilers, whether on the system
+#      or brewed, are named '<program>-<major>.<minor>', e.g. 'gcc-4.9'.
+#      This script creates links to the system compiler in this format
+#      automatically in the function 'doCreateCompilerLinks'. If your 
+#      system names gcc programs using a custom name or you wish to use
+#      a specific version, then you may add additional logic in this 
+#      function to link to the required GCC. For example, on RedHat5
+#      we need to use the system install of gcc 4.4, but on this system
+#      the executables are named 'gcc44' and 'g++44'.
 
 #-----------------------------------------------------------------------
 # MINIMAL API

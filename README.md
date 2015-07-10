@@ -225,18 +225,70 @@ Once complete, instructions should be printed on using the installed software.
 
 # Installing CadfaelBrew by Hand
 Should your system not be supported by the installer, or you cannot run the installer for other reasons, CadfaelBrew
-can be installed by hand. The installer script simply wraps these steps in a convenient manner together with package checks. To get CadfaelBrew itself installed, follow the instructions at ....
+can be installed by hand. The installer script simply wraps these steps in a convenient manner together with checks for required system packages. 
 
-The dedicated Homebrew tap for SuperNEMO should then be added:
+To get CadfaelBrew itself installed, first ensure you have the needed
+versions of Ruby and Git as [listed above](#system-requirements-for-cadfaelbrew).
+Should the system Ruby and Git versions not be sufficient, temporary
+local installs should be performed following the instructions on the
+[Ruby](http://www.ruby-lang.org) and [Git](https://git-scm.com) homepages. 
+Ensure that Ruby is built with OpenSSL support. If you have installed
+temporary Ruby and Git versions, ensure that the directories holding their 
+`ruby` and `git` executables are prepended to the UNIX PATH environment
+variable. 
+
+With the requisite Ruby and Git in place, clone the core CadfaelBrew
+repository to a location of your choice:
+
+```
+$ git clone https://github.com/SuperNEMO-DBD/cadfaelbrew.git Cadfael.git
+```
+
+Once checked out, prepend the `bin` subdirectory of the repository (in the
+example above this would be `Cadfael.git/bin`) to the PATH. Though not
+100% required, it makes running the following command easier, and gives
+immediate access to the installed software later.
+
+Before installing anything, run brew's self-check `doctor` command to
+see if there are any internal/setup issues:
+
+```
+$ brew doctor
+...
+```
+
+As the checks run are very stringent, it's likely that several warnings
+will be issued. Known ones that can be ignored include those about
+brew being installed in a non-default location, and duplicate programs
+in the path. If in doubt, raise an issue on the [CadfaelBrew issue tracker](https://github.com/SuperNEMO-DBD/cadfaelbrew).
+
+With CadfaelBrew ready to brew, the first thing to do if you needed
+to is install Ruby and Git by hand is to install the brewed versions:
+
+```
+$ brew install ruby git
+```
+
+You can then remove the temporary local installs you performed.
+
+To install Cadfael itself, begin by tapping its repository of Homebrew
+formulae:
 
 ```
 $ brew tap SuperNEMO-DBD/cadfael
 ```
 
-Finally, install cadfael:
+Now install cadfael:
 
 ```
 $ brew install cadfael
+```
+
+If installation completes successfully, you can review what was installed
+by running
+
+```
+$ brew ls --versions
 ```
 
 Should any errors occur, you can run again with
@@ -245,15 +297,19 @@ Should any errors occur, you can run again with
 $ brew install -v cadfael
 ```
 
-which should print out more information, or if you're happy for more manual intervention, do
+which will print out more information. If you're happy for more manual intervention, do
 
 ```
 $ brew install -vd cadfael
 ```
 
-This will offer to drop you into the build of the failing package from which you can run its configure/build
-system to try and diagnose the issue in more depth. If you are running on an unsupported system, the most likely
-cause of errors is missing system packages.
+This will offer to drop you into the build of the failing package (choose option '5') from which you can run its configure/build system to try 
+and diagnose the issue in more depth. 
+If you are running on an unsupported system, the most likely cause 
+of errors is missing system packages. Some investigation will be required
+through the system package manager to track these down. Though package
+names will not be the same across different systems, the [Ubuntu](ubuntu-14.04-lts) list can provide a good starting list for matching up to
+your system.
 
 ## Adding Support for New Systems
 If your system is not supported by the installer script, please submit a feature request on the issue tracker. 
@@ -263,7 +319,12 @@ To help in triaging whether support can be added, you should still clone this re
 $ ./cadfael-installer -s
 ```
 
-Paste the resulting output into your feature request. Support cannot be guaranteed for all systems.
+This will print out some information on the characteristics of your system.
+Paste this output into your feature request. Support cannot be guaranteed for all systems.
+
+If you prefer to add support by yourself, the steps needed to add support
+in the `cadfael-installer` script are documented within that script.
+Should you add support for a new system, please submit a pull request!
 
 
 # Containers
