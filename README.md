@@ -17,7 +17,7 @@ want to try testing CadfaelBrew to this.
 ## Supported
 As with upstream linuxbrew, only 64bit systems are supported.
 
-- [Mac OS X](https://www.apple.com/osx/) 10.8 (Mountain Lion), 10.9 (Mavericks), 10.10 (Yosemite)
+- [Mac OS X](https://www.apple.com/osx/) 10.9 (Mavericks), 10.10 (Yosemite)
 - Linux Distributions:
   - [RHEL](http://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)/[CentOS](https://www.centos.org) 6.X, 7.X
   - [Scientific Linux](https://www.scientificlinux.org) 6.X
@@ -219,7 +219,7 @@ The script will check that your system is supported and provides the needed syst
 Any missing packages will be reported together with instructions on installing them (this may need to be done by your sysadmin if you don't have sufficient privileges on the system).For certain older systems that do not provide a sufficiently recent version of the Ruby language that CadfaelBrew is written in, this will be bootstrapped.
 
 Once all requirements are met, the script clones CadfaelBrew's GitHub repository and performs a basic sanity check.
-It then runs the `brew` command to install the `cadfael` Formula that installs the required software packages. A
+It then runs the `brew` command to install the `cadfael` Formula that installs the required base software packages. A
 complete list of packages can be found in [the documentation for the `homebrew-cadfael` tap](https://github.com/SuperNEMO-DBD/homebrew-cadfael). Once complete, the `Cadfael.git` subdirectory created by the installer will be populated with a UNIX style flat directory hierarchy:
 
 ```
