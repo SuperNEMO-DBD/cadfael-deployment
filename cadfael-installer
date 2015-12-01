@@ -8,12 +8,14 @@
 # - Checkout correct repo
 # - brew doctor
 # - brew install [ruby] cadfael
+# - brew install bayeux
+# - brew install falaise
 #
 # - Currently supported systems:
 #   RHEL family 5/6/7
 #   SUSE Enterprise 11
 #   Ubuntu 14.04 LTS
-#   Mac OSX 10.8-10
+#   Mac OSX 10.9-11
 #
 # - How to add support for new Linux systems
 #   1) Get the output of `lsb_release -si | sed 's/ //g'`
@@ -93,7 +95,7 @@ readonly kCADFAELTAP="$kGITHUBORG/cadfael"
 readonly _kRHELIDREGEX='(RedHatEnterprise[[:alpha:]]*|CentOS|Scientific[[:alpha:]]*)'
 
 declare -a kSUPPORTEDSYSTEMS
-readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(8|9|10)" \
+readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(8|9|10|11)" \
                             "${_kRHELIDREGEX}-[5-7]\.[0-9][0-9]?" \
                             "SUSELINUX-11" \
                             "Ubuntu-14\.04")
@@ -555,14 +557,20 @@ doCheckUbuntu-14.04 () {
 #-----------------------------------------------------------------------
 # DARWIN CHECKS
 #-----------------------------------------------------------------------
-# - OS X 10.10/Yosemite
-doCheckMacOSX-10.10 () {
+# - OS X 10.11/El Capitan
+doCheckMacOSX-10.11 () {
   developerDir=$(/usr/bin/xcode-select -print-path 2>/dev/null)
   if [ -z "$developerDir" ] || [ ! -f "$developerDir/usr/bin/git" ] ; then
     _echo_info "Installing the Command Line Tools (expect a GUI popup):"
     sudo /usr/bin/xcode-select --install || _echo_exit "Failed to install Command Line Tools"
   fi
   return 0
+}
+
+# - OS X 10.10/Yosemite
+doCheckMacOSX-10.10 () {
+  doCheckMacOSX-10.11
+  return $?
 }
 
 # - OS X 10.9/Mavericks
@@ -755,21 +763,21 @@ doBrewSetup() {
 
 
 #-----------------------------------------------------------------------
-# Actually brew cadfael, if required
+# Brew a given formulae under the install prefix
 #
-doBrewCadfael() {
-  _echo_info "Starting brew of Cadfael..."
+doBrewFormula() {
+  _echo_info "Starting brew of $2"
   if [ -z "$1" ] ; then _echo_exit "No install directory" ; fi
   if [ ! -x "$1/Cadfael.git/bin/brew" ] ; then
     _echo_exit "No executable 'brew' command under '$1/Cadfael.git'"
   fi
 
-  if ! PATH="$1/Cadfael.git/bin:$PATH" brew install cadfael ; then
-    _echo_warning "Failed to brew Cadfael formula
+  if ! PATH="$1/Cadfael.git/bin:$PATH" brew install $2 ; then
+    _echo_warning "Failed to brew formula $2
   
   This is likely due to a failure to build one of its dependencies:
 
-  $(PATH="$1/Cadfael.git/bin:$PATH" brew deps -n1 cadfael)
+  $(PATH="$1/Cadfael.git/bin:$PATH" brew deps -n1 $2)
 
   To proceed, change into the directory
 
@@ -777,7 +785,7 @@ doBrewCadfael() {
 
   and manually run
 
-  ./brew install -v cadfael
+  ./brew install -v $2
 
   This will pick up installation at the last, and failing formula. The
   '-v' option will produce more output to help track down the error.
@@ -788,8 +796,32 @@ doBrewCadfael() {
     return 1
   fi
 
-  _echo_info "Cadfael Formulae brewed o.k."
+  _echo_info "$2 Formulae brewed o.k."
   return 0
+}
+
+#-----------------------------------------------------------------------
+# Actually brew cadfael, if required
+#
+doBrewCadfael() {
+  doBrewFormula $1 cadfael
+  return $?
+}
+
+#-----------------------------------------------------------------------
+# Actually brew bayeux, if required
+#
+doBrewBayeux() {
+  doBrewFormula $1 bayeux
+  return $?
+}
+
+#-----------------------------------------------------------------------
+# Actually brew falaise, if required
+#
+doBrewFalaise() {
+  doBrewFormula $1 falaise
+  return $?
 }
 
 #-----------------------------------------------------------------------
@@ -915,6 +947,8 @@ main() {
   doBrewSetup "$installPrefix" || _echo_exit "CadfaelBrew setup failed"
   if [ -z "$bareInstall" ] ; then
     doBrewCadfael "$installPrefix" || _echo_exit "Brewing of Cadfael formula failed"
+    doBrewBayeux "$installPrefix" || _echo_exit "Brewing of Bayeux formula failed"
+    doBrewFalaise "$installPrefix" || _echo_exit "Brewing of Falaise formula failed"
   fi
 
   doHelpSetup "$installPrefix"
@@ -925,6 +959,11 @@ Note that you have not as yet installed the Cadfael formula, so you
 should now do:
 
   \$ $installPrefix/Cadfael.git/bin/brew install cadfael
+
+optionally followed by
+
+  \$ $installPrefix/Cadfael.git/bin/brew install falaise
+
   "
   fi
 
