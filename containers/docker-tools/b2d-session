@@ -9,6 +9,8 @@ function error_exit {
   exit 1
 }
 
+echo "WARNING: boot2docker is deprecated, use docker-machine instead" 1>&2
+
 [[ `uname` == "Darwin" ]] || error_exit "b2d-session only runs on Mac"
 
 # Start up...
