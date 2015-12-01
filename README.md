@@ -226,6 +226,8 @@ complete list of packages can be found in [the documentation for the `homebrew-c
 +- Cadfael.git/
    +- bin/
    |  +- brew
+   |  +- flsimulate
+   |  +- flreconstruct
    |  +- root
    |  +- ... other programs ...
    +- lib/
@@ -242,16 +244,26 @@ complete list of packages can be found in [the documentation for the `homebrew-c
       +- ... physical, versioned installs of packages ...
 ```
 
-Once complete, instructions should be printed on setting up your system to use the installed software. The simplest way to start using brewed software is to run
+Note that the SuperNEMO specific Bayeux and Falaise packages are installed by default at their latest release versions.
+If you are contributing to the development of these packages and instead wish to use your own SVN working copies and avoid clashes/confusion, then run
 
 ```
-$ ./PATHTO/Cadfael.git/bin/brew sh
+$ /PATHTO/Cadfael.git/bin/brew unlink falaise bayeux
+```
+
+where `PATHTO` is the location under which you installed `Cadfael.git`. The `unlink` command will remove Bayeux and 
+Falaise programs, libraries and headers from the `bin`, `lib` and `include` directories, but retain a physical copy in `Cellar` which can be run directly or relinked later if your require. 
+
+Once installation is complete, instructions should be printed on setting up your system to use the installed software. The simplest way to start using brewed software is to run
+
+```
+$ /PATHTO/Cadfael.git/bin/brew sh
 ```
 
 This will drop you into a new shell session under the brewed environment. You should then be able to run programs and develop against the brewed software directly, and then exit back to a pristine shell e.g.
 
 ```
-$ ./PATHTO/Cadfael.git/bin/brew sh
+$ /PATHTO/Cadfael.git/bin/brew sh
 ... new shell starts ...
 $ root
 ... brewed root starts, do some work ...
@@ -333,6 +345,12 @@ by running
 
 ```
 $ brew ls --versions
+```
+
+At this point you can also install Bayeux and Falaise if required:
+
+```
+$ brew install falaise
 ```
 
 Should any errors occur, you can run again with
