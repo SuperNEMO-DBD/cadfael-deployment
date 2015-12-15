@@ -772,8 +772,8 @@ doBrewFormula() {
     _echo_exit "No executable 'brew' command under '$1/Cadfael.git'"
   fi
 
-  if ! PATH="$1/Cadfael.git/bin:$PATH" brew install $2 ; then
-    _echo_warning "Failed to brew formula $2
+  if ! PATH="$1/Cadfael.git/bin:$PATH" brew install $2 $3; then
+    _echo_warning "Failed to 'brew install $2 $3'
   
   This is likely due to a failure to build one of its dependencies:
 
@@ -804,7 +804,7 @@ doBrewFormula() {
 # Actually brew cadfael, if required
 #
 doBrewCadfael() {
-  doBrewFormula $1 cadfael
+  doBrewFormula $1 cadfael $2
   return $?
 }
 
@@ -812,7 +812,7 @@ doBrewCadfael() {
 # Actually brew bayeux, if required
 #
 doBrewBayeux() {
-  doBrewFormula $1 bayeux
+  doBrewFormula $1 bayeux $2
   return $?
 }
 
@@ -820,7 +820,7 @@ doBrewBayeux() {
 # Actually brew falaise, if required
 #
 doBrewFalaise() {
-  doBrewFormula $1 falaise
+  doBrewFormula $1 falaise $2
   return $?
 }
 
@@ -891,6 +891,7 @@ Arguments:
                         current working directory
   -b                    Do not install Cadfael Formula after bootstrapping
                         CadfaelBrew
+  -e                    Install all formulae with C++11 support 
 
 Exit status:
   0  if OK
@@ -907,8 +908,11 @@ EOF
 main() {
   local installPrefix=$(pwd)
 
-  while getopts ":hsbp:" opt ; do
+  while getopts ":hsbep:" opt ; do
     case $opt in
+      e)
+        local cppStdOption="--c++11"
+        ;;
       b)
         local bareInstall="bareInstall"
         ;;
@@ -946,9 +950,9 @@ main() {
   doGithubClone "$installPrefix" || _echo_exit "Clone of CadfaelBrew repo failed"
   doBrewSetup "$installPrefix" || _echo_exit "CadfaelBrew setup failed"
   if [ -z "$bareInstall" ] ; then
-    doBrewCadfael "$installPrefix" || _echo_exit "Brewing of Cadfael formula failed"
-    doBrewBayeux "$installPrefix" || _echo_exit "Brewing of Bayeux formula failed"
-    doBrewFalaise "$installPrefix" || _echo_exit "Brewing of Falaise formula failed"
+    doBrewCadfael "$installPrefix" $cppStdOption || _echo_exit "Brewing of Cadfael formula failed"
+    doBrewBayeux "$installPrefix" $cppStdOption || _echo_exit "Brewing of Bayeux formula failed" 
+    doBrewFalaise "$installPrefix" $cppStdOption || _echo_exit "Brewing of Falaise formula failed"
   fi
 
   doHelpSetup "$installPrefix"
