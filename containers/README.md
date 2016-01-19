@@ -9,6 +9,14 @@ easy to setup multiplatform testing and validation.
 Currently only using Docker, but other ideas should be explored (Rocket,
 isolated glibc envs on Linux).
 
+Installing Docker
+=================
+Mac OS X
+--------
+- Install [Docker Toolbox]([Docker Toolbox](https://www.docker.com/docker-toolbox).
+- Start Docker Quickstart Terminal
+  - This should create a VM if none exists, then start it
+
 Working on Mac with `boot2docker`
 =================================
 NB: boot2docker is now deprecated. [Docker Toolbox](https://www.docker.com/docker-toolbox) should be used instead.
@@ -21,8 +29,6 @@ install requires.
 
 Build/Run Containers
 ====================
-- Ensure boot2docker is running
-
 - To build the container from the Dockerfile in the cwd:
   ```
   $ docker build -t <containername> .
@@ -35,6 +41,10 @@ Build/Run Containers
 
 - Run the container
   ```
-  $ docker run <containername>
+  $ docker run -t <containername>
   ```
 
+- Run container interactively
+  ```
+  $ docker run -i -t <containername> /bin/bash
+  ```

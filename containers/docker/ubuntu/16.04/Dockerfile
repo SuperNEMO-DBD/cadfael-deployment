@@ -1,26 +1,33 @@
-FROM centos:centos7
+FROM ubuntu:16.04
 MAINTAINER Ben Morgan <Ben.Morgan@warwick.ac.uk>
 
-# Update and install base 
-ADD RPM-GPG-KEY-wlcg /etc/pki/rpm-gpg/RPM-GPG-KEY-wlcg
-ADD WLCG.repo /etc/yum.repos.d/WLCG.repo
-RUN yum update -y && \
-  yum install -y \
-    git \
-    HEP_OSlibs \
-    openssl-devel \
-    ruby-irb \
-    redhat-lsb-core \
-    # Need static glibc/stdc++ at least for building patchelf
-    glibc-static \
-    libstdc++-static \
-  yum groupinstall -y "Development Tools"
+# Update and install base packages for CadfaelBrew - will be added to
+# as we identify base system requirements
+RUN apt-get update && apt-get install -y \
+  # Not in base system or newly needed
+  lsb-release \
+  iputils-ping \
+  # Known from Ubuntu 14
+  build-essential \
+  curl \
+  git \
+  m4 \
+  libbz2-dev \
+  libcurl4-openssl-dev \
+  libexpat-dev \
+  libncurses-dev \
+  ruby \
+  texinfo \
+  zlib1g-dev \
+  libx11-dev \
+  libxpm-dev \
+  libxft-dev \
+  libxext-dev \
+  libpng12-dev \
+  libjpeg-dev
 
 # Create user
 RUN useradd -m -U cadfael
-
-# Dirty hack to fix "ping: icmp open socket: Operation not permitted"
-RUN chmod u+s /usr/bin/ping
 
 # Now our own user and basic "at container entry" setup
 USER cadfael
@@ -41,4 +48,3 @@ CMD git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git && \
   ./brew test falaise && \
   ./brew ls --versions && \
   ./brew info
-
