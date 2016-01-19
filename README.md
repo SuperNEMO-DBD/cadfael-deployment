@@ -17,20 +17,21 @@ want to try testing CadfaelBrew to this.
 ## Supported
 As with upstream linuxbrew, only 64bit systems are supported.
 
-- [Mac OS X](https://www.apple.com/osx/) 10.9 (Mavericks), 10.10 (Yosemite)
+- [Mac OS X](https://www.apple.com/osx/) 10.9 (Mavericks), 10.10 (Yosemite) 10.11 (El Capitan)
 - Linux Distributions:
   - [RHEL](http://www.redhat.com/en/technologies/linux-platforms/enterprise-linux)/[CentOS](https://www.centos.org) 6.X, 7.X
   - [Scientific Linux](https://www.scientificlinux.org) 6.X
   - [Ubuntu](http://www.ubuntu.com) 14.04LTS
 
-All require of order 2GB disk space for the final install. A similar
+All require of order 3GB disk space for the final install. A similar
 amount is needed for downloads of source/binary packages plus
 temporary space when building packages from source.
 
-If your system is not listed above, this does not neccessarily mean that CadfaelBrew
+If your system is not listed above, this does not necessarily mean that CadfaelBrew
 will not work on it. Please review the sections on [deprecated](#deprecated)
 and [work in progress](#work-in-progress) to see if your system is listed. If it
-is not listed and you'd like support for it, please see the section on [manually installing CadfaelBrew](#installing-cadfaelbrew-by-hand) for further instructions.
+is not listed and you'd like support for it, please see the section on 
+[manually installing CadfaelBrew](#installing-cadfaelbrew-by-hand) for further instructions.
 
 ## Deprecated
 Supported on a 'best effort' basis, largely to allow use on older cluster
@@ -43,10 +44,8 @@ These are known upcoming systems that will be supported but are currently
 not supported by upstream Homebrew/Linuxbrew or are not at the release
 stage.
 
-- Mac OS X 10.11 (El Capitan)
-  - Currently in Beta, release expected Autumn 2015
-- Scientific Linux 7
-  - Expected to be no different from RHEL/CentOS7 but requires testing
+- Mac OS X 10.12 (?)
+  - Release expected Autumn 2016
 - Ubuntu 16.04LTS
   - Next LTS (Long Term Support) version. Expected Spring 2016
 
@@ -72,13 +71,13 @@ The installer script will bootstrap a temporary local Ruby install if the
 system package manager cannot supply
 a sufficient version. It will then use `brew` itself to install the
 Homebrew Ruby for permanent use. So far no issues have been encountered
-with Git versions, though this can also be bootstrapped in future if required. Package lists below include any packages needed to bootstrap
-Ruby/Git.
+with Git versions, though this can also be bootstrapped in future if required. 
+Package lists below include any packages needed to bootstrap Ruby/Git.
 
 ## Mac OS X
 Support for OS X follows Homebrew itself, and this generally means the last three production versions.
-At the time of writing this means OS X 10.8 (Mountain Lion), 10.9 (Mavericks) and 10.10 (Yosemite).
-System requirements are only what homebrew itself requires - OS X plus Xcode. The latter
+At the time of writing this means OS X 10.9 (Mavericks), 10.10 (Yosemite) and 10.11 (El Capitan).
+System requirements are only what homebrew itself requires - OS X plus Xcode/CLT. The latter
 may be installed through the [App Store](https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12),
 though `cadfael-installer` will offer to install it for you if it is not present
 when you run the installer script.
@@ -92,8 +91,12 @@ on trying to match the base system software supplied by Apple.
 
 ## RHEL/CentOS/SL 6/7
 On this family, the [`HEP_OSlibs`](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM)
-metapackage is used to provide most of the functionality on top of the base system as this is should always be installed on any system running LHC software. To get and install this rpm, follow the instructions as
-provided for the [6 Series](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) or [7 Series](https://twiki.cern.ch/twiki/bin/view/LCG/CentOS7DependencyRPM) as appropriate. A few extra packages are needed
+metapackage is used to provide most of the functionality on top of the base system as this is 
+should always be installed on any system running LHC software. To get and install 
+this rpm, follow the instructions as provided for the 
+[6 Series](https://twiki.cern.ch/twiki/bin/view/LCG/SL6DependencyRPM) or 
+[7 Series](https://twiki.cern.ch/twiki/bin/view/LCG/CentOS7DependencyRPM) 
+as appropriate. A few extra packages are needed
 to support Cadfael's bootstrapping proceedure, so the basic list of
 rpms for the 6 series is:
 
@@ -117,7 +120,9 @@ git \
 HEP_OSlibs \
 openssl-devel \
 ruby-irb \
-redhat-lsb-core
+redhat-lsb-core \
+glibc-static \
+libstdc++-static
 
 $ yum groupinstall -y 'Development tools'
 ```
@@ -327,11 +332,10 @@ $ brew install ruby git
 
 You can then remove the temporary local installs you performed.
 
-To install Cadfael itself, begin by tapping its repository of Homebrew
-formulae:
+To install Cadfael itself, begin by updating brew to setup everything
 
 ```
-$ brew tap SuperNEMO-DBD/cadfael
+$ brew update
 ```
 
 Now install cadfael:
