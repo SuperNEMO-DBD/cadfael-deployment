@@ -13,7 +13,7 @@ RUN yum update -y && \
     redhat-lsb-core \
     # Need static glibc/stdc++ at least for building patchelf
     glibc-static \
-    libstdc++-static \
+    libstdc++-static && \
   yum groupinstall -y "Development Tools"
 
 # Create user
@@ -36,7 +36,7 @@ WORKDIR /home/cadfael
 # Also, can pass args so could checkout tags, build tarballs
 CMD git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git && \
   cd cadfael-installer && \
-  ./cadfael-installer && \
+  ./cadfael-installer -e && \
   cd Cadfael.git/bin && \
   ./brew test falaise && \
   ./brew ls --versions && \
