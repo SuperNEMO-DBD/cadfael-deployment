@@ -1,7 +1,7 @@
 Cadfael Containers
 ==================
 Experimental repository for containerizing build and integration
-testing of Cadfael and then SuperNEMO software.
+testing SuperNEMO software.
 
 Aim is not for distributing software as a container, rather as an
 easy to setup multiplatform testing and validation.
@@ -11,21 +11,27 @@ isolated glibc envs on Linux).
 
 Installing Docker
 =================
+Linux
+-----
+TODO
+
 Mac OS X
 --------
-- Install [Docker Toolbox]([Docker Toolbox](https://www.docker.com/docker-toolbox).
+- Install [Docker Toolbox](https://www.docker.com/docker-toolbox).
 - Start Docker Quickstart Terminal
   - This should create a VM if none exists, then start it
+  - Review Docker toolbox for guides on increasing disk quota/RAM/CPU
 
-Working on Mac with `boot2docker`
-=================================
-NB: boot2docker is now deprecated. [Docker Toolbox](https://www.docker.com/docker-toolbox) should be used instead.
+Supported Container Distros
+===========================
+The same Linuces as those supported for Cadfael
 
-To increase boot2docker VM disk size, see [this guide](https://ryanfb.github.io/etc/2015/01/28/increasing_boot2docker_allocations_on_os_x.html)
-on increasing it using a user profile file.
+- RedHat Family 6/7 (inc. Scientific Linux, CentOS)
+- Ubuntu 14.04 LTS
 
-TODO: Add disk space logger in dockerfiles to log what a full Cadfael
-install requires.
+Other distros will be added as required based on use cases and availability of docker images
+
+Testing on Mac OS X should use the native system or VMs from Parallels or other.
 
 Build/Run Containers
 ====================
@@ -33,6 +39,7 @@ Build/Run Containers
   ```
   $ docker build -t <containername> .
   ```
+  It's recommends that `<containername>` be `cadfael-<distroid><distroversion>`, e.g. "`cadfael-ubuntu1404`".
 
 - Check images for latest builds
   ```
