@@ -13,7 +13,9 @@ RUN yum update -y && \
     redhat-lsb-core \
     # Need static glibc/stdc++ at least for building patchelf
     glibc-static \
-    libstdc++-static && \
+    libstdc++-static \
+    # which isn't a defualt installed package...
+    which && \
   yum groupinstall -y "Development Tools"
 
 # Create user
@@ -34,11 +36,9 @@ WORKDIR /home/cadfael
 # containers for continuous builds The sections above could be used
 # as a base image here (probably)
 # Also, can pass args so could checkout tags, build tarballs
-CMD git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git && \
-  cd cadfael-installer && \
-  ./cadfael-installer -e && \
-  cd Cadfael.git/bin && \
-  ./brew test falaise && \
-  ./brew ls --versions && \
-  ./brew info
-
+CMD git clone https://github.com/SuperNEMO-DBD/cadfaelbrew.git && \
+  cd cadfaelbrew && \
+  ./bin/brew cadfael-bootstrap && \
+  ./bin/brew install falaise && \
+  ./bin/brew ls --versions && \
+  ./bin/brew info

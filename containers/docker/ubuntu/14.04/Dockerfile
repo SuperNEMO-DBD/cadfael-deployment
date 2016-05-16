@@ -28,7 +28,6 @@ RUN useradd -m -U cadfael
 # Now our own user and basic "at container entry" setup
 USER cadfael
 WORKDIR /home/cadfael
-#ENV PATH /home/cadfael/cadfael-installer/Cadfael.git/bin:$PATH
 
 # ---------------------------------------------------------------------
 # What actually happens when we RUN the container under "docker run"
@@ -37,10 +36,9 @@ WORKDIR /home/cadfael
 # containers for continuous builds The sections above could be used
 # as a base image here (probably)
 # Also, can pass args so could checkout tags, build tarballs
-CMD git clone https://github.com/SuperNEMO-DBD/cadfael-installer.git && \
-  cd cadfael-installer && \
-  ./cadfael-installer && \
-  cd Cadfael.git/bin && \
-  ./brew test falaise && \
-  ./brew ls --versions && \
-  ./brew info
+CMD git clone https://github.com/SuperNEMO-DBD/cadfaelbrew.git && \
+  cd cadfaelbrew && \
+  ./bin/brew cadfael-bootstrap && \
+  ./bin/brew install falaise && \
+  ./bin/brew ls --versions && \
+  ./bin/brew info
