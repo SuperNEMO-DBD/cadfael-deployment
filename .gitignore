@@ -3,7 +3,7 @@
 
 # Except these...
 !.gitignore
-!cadfael-installer
 !LICENSE
 !README.md
-!/containers/
+!/docker/
+!/cvmfs/
