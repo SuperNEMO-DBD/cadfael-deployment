@@ -1,37 +1,43 @@
-Cadfael Containers
-==================
-Experimental repository for containerizing build and integration
-testing SuperNEMO software.
-
-Aim is not for distributing software as a container, rather as an
-easy to setup multiplatform testing and validation.
-
-Currently only using Docker, but other ideas should be explored (Rocket,
-isolated glibc envs on Linux).
-
-Installing Docker
-=================
-Linux
------
-TODO
-
-Mac OS X
---------
-- Install [Docker Toolbox](https://www.docker.com/docker-toolbox).
-- Start Docker Quickstart Terminal
-  - This should create a VM if none exists, then start it
-  - Review Docker toolbox for guides on increasing disk quota/RAM/CPU
-
-Supported Container Distros
+SuperNEMO Docker Containers
 ===========================
-The same Linuces as those supported for Cadfael
 
-- RedHat Family 6/7 (inc. Scientific Linux, CentOS)
-- Ubuntu 14.04 LTS
+Dockerfiles and additional tools for building images of the SuperNEMO
+software for testing and deployment. Four core platforms are
+supported for Continuous Integration:
 
-Other distros will be added as required based on use cases and availability of docker images
+- CentOS 6, 7
+- Ubuntu 14.04LTS, 16.04LTS
 
-Testing on Mac OS X should use the native system or VMs from Parallels or other.
+Ubuntu 16.04LTS is supported as the primary distribution for images
+of the full software stack.
+
+Installing and Using Docker
+===========================
+
+See the [comprehensive guides on the official docker site](https://docs.docker.com).
+
+
+Build/Tag Containers
+====================
+
+Have an organisation on [Docker Hub/Cloud](https://hub.docker.com/r/supernemo/) where
+images will be hosted. Need a setup/naming convention for repositories and image
+tags. Ideally separate by OS as primary id, with or without version. Also want
+to separate out "base" images from higher level ones so that Dockerfiles don't get
+cluttered, and can reuse layers as best we can.
+
+Want to check how layers in the `brew` system will work. As the primary goal is
+to get containers working for CI, can split into a few layers:
+
+1. Base system, so all system packages/setup
+2. Base brew checkout and update
+3. Bootstrap packages (may include compiler, so potentially heavyweight)
+4. Package set up to Falaise (the testbot part)
+
+This should lead to a similar image size provided we're careful to ensure
+proper "install/cleanup" steps at each `RUN` command (i.e. remove everything
+temporary created in the step before going on to the next one).
+
 
 Build/Run Containers
 ====================

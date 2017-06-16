@@ -17,10 +17,24 @@ RUN yum update -y && \
 # Create user
 RUN useradd -m -U cadfael
 
-# Now our own user and basic "at container entry" setup
+# Now our own user and basic setup
 USER cadfael
 WORKDIR /home/cadfael
-#ENV PATH /home/cadfael/cadfael-installer/Cadfael.git/bin:$PATH
+
+RUN git config --global user.name "Cadfael" && \
+    git config --global user.email " "
+
+ 
+#Basic tool layer
+RUN git clone --depth 1 https://github.com/SuperNEMO-DBD/brew.git && \
+    cd brew && \
+    ./bin/brew update && \
+    ./bin/brew pull --no-publish https://github.com/SuperNEMO-DBD/homebrew-cadfael/pull/11 && \
+    ./bin/brew cadfael-bootstrap && \
+    ./bin/brew install --only-dependencies bayeux bayeux@2 && \
+    ./bin/brew cleanup -s && \
+    rm -Rf $(./bin/brew --cache)
+
 
 # ---------------------------------------------------------------------
 # What actually happens when we RUN the container under "docker run"
@@ -29,7 +43,7 @@ WORKDIR /home/cadfael
 # containers for continuous builds The sections above could be used
 # as a base image here (probably)
 # Also, can pass args so could checkout tags, build tarballs
-CMD git clone https://github.com/SuperNEMO-DBD/cadfaelbrew.git && \
+CMD git clone https://github.com/SuperNEMO-DBD/brew.git cadfaelbrew && \
   cd cadfaelbrew && \
   ./bin/brew cadfael-bootstrap && \
   ./bin/brew install falaise && \
