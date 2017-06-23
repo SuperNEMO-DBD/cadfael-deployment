@@ -26,7 +26,8 @@ RUN git clone https://github.com/SuperNEMO-DBD/brew.git /home/linuxbrew/.linuxbr
 USER linuxbrew
 WORKDIR /home/linuxbrew
 ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
-          SHELL=/bin/bash
+    SHELL=/bin/bash \
+    USER=linuxbrew
 
 # Install bootstrap layer
 RUN brew update \
