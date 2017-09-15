@@ -43,7 +43,7 @@ RUN brew update \
     && rm -Rf $(brew --cache)
 
 # Install Falaise dependency layer
-#RUN brew install falaise --only-dependencies \
-#    && brew cleanup -s \
-#    && rm -Rf $(brew --cache)
+RUN brew install falaise --only-dependencies \
+    && brew cleanup -s \
+    && rm -Rf $(brew --cache)
 
