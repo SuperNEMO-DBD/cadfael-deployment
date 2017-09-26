@@ -93,6 +93,9 @@ $
 See the [documentation on data volumes](https://docs.docker.com/engine/tutorials/dockervolumes/)
 for more features and advanced data shared topics.
 
+By default, pulling the `supernemo/falaise` image gets you the current production release.
+Older versions may also be pulled and are hosted on the [SuperNEMO Docker Hub](https://hub.docker.com/r/supernemo/falaise/).
+See the [Tags](https://hub.docker.com/r/supernemo/falaise/tags) page for a full list of versions.
 
 Building Images
 ===============
