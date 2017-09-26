@@ -15,6 +15,6 @@ See the [docker](docker) subproject for details
 See the [cvmfs](cvmfs) subproject for further details.
 
 # Other
-Other solutions such as other container systems or isolated
+Other solutions such as other container systems (e.g. [Singularity](http://singularity.lbl.gov/index.html)) or isolated
 `glibc` environments (Linux) may be explored.
 
