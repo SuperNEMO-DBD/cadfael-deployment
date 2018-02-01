@@ -37,7 +37,8 @@ ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
     USER=linuxbrew
 
 # Install bootstrap layer
-RUN brew update \
+RUN brew vendor-install ruby \
+    && brew update \
     && brew cadfael-bootstrap \
     && brew cleanup -s \
     && rm -Rf $(brew --cache)
