@@ -50,9 +50,14 @@ ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
 # Install bootstrap layer
 RUN brew vendor-install ruby \
     && brew update \
-    && brew cadfael-bootstrap \
+    && brew install patchelf ninja cmake \
     && brew cleanup -s \
     && rm -Rf $(brew --cache)
+
+#RUN brew install python@2 \
+#    && brew cadfael-bootstrap \
+#    && brew cleanup -s \
+#    && rm -Rf $(brew --cache)
 
 # Install Falaise dependency layer
 RUN brew install falaise --only-dependencies \

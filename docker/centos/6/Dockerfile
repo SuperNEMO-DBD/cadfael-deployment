@@ -1,7 +1,7 @@
 FROM centos:centos6
 MAINTAINER Ben Morgan <Ben.Morgan@warwick.ac.uk>
 
-# Update and install base 
+# Update and install base
 ADD RPM-GPG-KEY-cern /etc/pki/rpm-gpg/RPM-GPG-KEY-cern
 ADD HEP_OSlibs.repo /etc/yum.repos.d/HEP_OSlibs.repo
 RUN yum update -y \
@@ -32,12 +32,16 @@ ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
 
 # Install bootstrap layer
 RUN brew vendor-install ruby \
-    && brew update \
+    && brew update -f \
     && brew cadfael-bootstrap \
     && brew cleanup -s \
     && rm -Rf $(brew --cache)
 
 # Install Falaise dependency layer
+RUN brew install libpng \
+    && brew cleanup -s \
+    && rm -Rf $(brew --cache)
+
 RUN brew install falaise --only-dependencies \
     && brew cleanup -s \
     && rm -Rf $(brew --cache)
